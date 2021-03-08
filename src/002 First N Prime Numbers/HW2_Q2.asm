@@ -12,17 +12,18 @@ FLAG    DW      1
 NUMSTR  DB      '$$$$$'      ;converted NUM to string for 5 digits
 MSG1    DB      0Dh, 'Enter N: $'
 MSG2    DB      'N is too big!', 0Dh, 0Ah, 'use values from 0 to 6542.$'
+MSG3    DB      ': $'
 ;----------------------------------------------------------     
         .CODE
 MAIN    PROC    FAR
         MOV     AX, @DATA   ;load the data segment address
         MOV     DS, AX      ;assign value to DS
-start:  ;clear screen
-        MOV AX,0600H        ;06 TO SCROLL & 00 FOR FULLJ SCREEN
-        MOV BH,71H          ;ATTRIBUTE 7 FOR BACKGROUND AND 1 FOR FOREGROUND
-        MOV CX,0000H        ;STARTING COORDINATES
-        MOV DX,184FH        ;ENDING COORDINATES
-        INT 10H             ;FOR VIDEO DISPLAY
+START:  ;clear screen
+        MOV     AX,0600H        ;06 TO SCROLL & 00 FOR FULLJ SCREEN
+        MOV     BH,71H          ;ATTRIBUTE 7 FOR BACKGROUND AND 1 FOR FOREGROUND
+        MOV     CX,0000H        ;STARTING COORDINATES
+        MOV     DX,184FH        ;ENDING COORDINATES
+        INT     10H             ;FOR VIDEO DISPLAY
         ;get N
         MOV     DX, OFFSET MSG1
         MOV     AH, 9
@@ -76,7 +77,19 @@ ENDIF1:
 EWHILE: 
         MOV     AH, 4CH     ;set up to
         INT     21H
-PRINT:  
+PRINT:
+        ;display index
+        MOV     SI, OFFSET NUMSTR
+        MOV     AX, COUNT
+        CALL    NUMBER2STRING   ;retruns numstr
+        MOV     AH, 9
+        MOV     DX, OFFSET NUMSTR
+        INT     21h
+        ;print seperator for index and number
+        MOV     DX, OFFSET MSG3
+        MOV     AH, 9
+        INT     21h
+        ;  
         MOV     SI, OFFSET NUMSTR
         MOV     AX, NUM
         CALL    NUMBER2STRING   ;retruns numstr
