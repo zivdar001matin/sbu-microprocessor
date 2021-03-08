@@ -29,13 +29,13 @@ MAIN    PROC    FAR
         MOV     AH, 9
         INT     21h
         CALL    SCAN_BNUM   ;return 16bit binary number in CX
-        MOV     [SI+2], CX
+        MOV     DATA2, CX
         ;calculate modulo
         XOR     DX, DX      ;clear DX
-        MOV     AX, [SI]
-        MOV     BX, [SI+2]
+        MOV     AX, DATA1
+        MOV     BX, DATA2
         DIV     BX
-        MOV     [SI+4], DX
+        MOV     RESULT, DX
         ;print result
         MOV     DX, OFFSET MSG3
         MOV     AH, 9
