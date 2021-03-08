@@ -17,6 +17,12 @@ MSG3    DB      0Dh,0Ah, 'Modulo result is: $'
 MAIN    PROC    FAR
         MOV     AX, @DATA   ;load the data segment address
         MOV     DS, AX      ;assign value to DS
+START:  ;clear screen
+        MOV     AX,0600H        ;06 TO SCROLL & 00 FOR FULLJ SCREEN
+        MOV     BH,71H          ;ATTRIBUTE 7 FOR BACKGROUND AND 1 FOR FOREGROUND
+        MOV     CX,0000H        ;STARTING COORDINATES
+        MOV     DX,184FH        ;ENDING COORDINATES
+        INT     10H             ;FOR VIDEO DISPLAY
         MOV     SI, OFFSET DATA1
         ;get first number
         MOV     DX, OFFSET MSG1
