@@ -10,11 +10,13 @@ DATA2   DB      ?           ;binary number
 RESULT  DB      ?
 MSG1    DB      'Enter the BCD number: $' 
 MSG2    DB      0Dh,0Ah, 'Enter the Binary number: $'
+MSG3    DB      0Dh,0Ah, 'Modulo result is: $'
 ;----------------------------------------------------------
         .CODE
 MAIN    PROC    FAR
         MOV     AX, @DATA   ;load the data segment address
         MOV     DS, AX      ;assign value to DS
+        MOV     SI, OFFSET DATA1
         ;get first number
         MOV     DX, OFFSET MSG1
         MOV     AH, 9
@@ -27,8 +29,18 @@ MAIN    PROC    FAR
         MOV     AH, 9
         INT     21h
         CALL    SCAN_BNUM   ;return 16bit binary number in CX
-        MOV     SI, OFFSET DATA2
-        MOV     [SI], CX
+        MOV     [SI+2], CX
+        ;calculate modulo
+        XOR     DX, DX      ;clear DX
+        MOV     AX, [SI]
+        MOV     BX, [SI+2]
+        DIV     BX
+        MOV     [SI+4], DX
+        ;print result
+        MOV     DX, OFFSET MSG1
+        MOV     AH, 9
+        INT     21h
+        ;TODO
         ;
         MOV     AH, 4CH     ;set up to
         INT     21H
