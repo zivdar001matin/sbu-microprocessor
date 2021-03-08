@@ -5,9 +5,10 @@ TITLE   PROG1   (EXE)   PURPOSE: MOD OF A BCD NUMBER ON 16 NIT BINARY
         .STACK 64
 ;----------------------------------------------------------
         .DATA
-DATA1   DB      ?           ;BCD number
-DATA2   DB      ?           ;binary number          
-RESULT  DB      ?
+DATA1   DD      ?           ;BCD number
+DATA2   DD      ?           ;binary number          
+RESULT  DD      ?
+NUMSTR  DB      '$$$$'      ;converted RESULT to string for 4 digits
 MSG1    DB      'Enter the BCD number: $' 
 MSG2    DB      0Dh,0Ah, 'Enter the Binary number: $'
 MSG3    DB      0Dh,0Ah, 'Modulo result is: $'
@@ -21,9 +22,8 @@ MAIN    PROC    FAR
         MOV     DX, OFFSET MSG1
         MOV     AH, 9
         INT     21h
-        CALL    SCAN_NUM    ;return 16bit BCD number in CX
-        MOV     SI, OFFSET DATA1
-        MOV     [SI], CX
+        CALL    SCAN_NUM    ;return 16bit BCD number in CX1
+        MOV     DATA1, CX
         ;get second number
         MOV     DX, OFFSET MSG2
         MOV     AH, 9
@@ -37,7 +37,7 @@ MAIN    PROC    FAR
         DIV     BX
         MOV     [SI+4], DX
         ;print result
-        MOV     DX, OFFSET MSG1
+        MOV     DX, OFFSET MSG3
         MOV     AH, 9
         INT     21h
         ;TODO
