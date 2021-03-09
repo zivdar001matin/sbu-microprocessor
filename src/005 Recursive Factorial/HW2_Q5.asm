@@ -9,7 +9,7 @@ N       DW      ?           ;number
 RESULT  DW      ?           ;result of factorial
 NUMSTR  DB      '$$$$$'      ;converted NUM to string for 5 digits
 MSG1    DB      0Dh, 'Enter N: $'
-MSG2    DB      'N is too big!', 0Dh, 0Ah, 'use values from 0 to 12.$'
+MSG2    DB      'N is too big!', 0Dh, 0Ah, 'use values from 0 to 8.$'
 MSG3    DB      0Dh, 0Ah, 'Result of factorial is: $'
 ;----------------------------------------------------------
         .CODE
@@ -29,7 +29,7 @@ START:  ;clear screen
         CALL    SCAN_NUM        ;return number in CX
         MOV     N, CX
         ;overflow check
-        CMP     CX, 12        ;factorial(13) doesn't fit in 16bits regiter
+        CMP     CX, 8        ;factorial(9) BCD doesn't fit in 16bits regiter
         JG      OVERFLOW
         ;display line break
         MOV     DX, 13
@@ -76,7 +76,7 @@ MAIN    ENDP
 ;PARAMETERS : AX = NUMBER TO CONVERT.
 FACTORIAL   PROC
         CMP     AX, 1       ;if(AX==1)
-        JE      RETURN      ;return 1
+        JLE     RETURN      ;return 1
         PUSH    AX
         DEC     AX
         CALL    FACTORIAL
