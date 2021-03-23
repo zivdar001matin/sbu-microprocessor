@@ -6,23 +6,13 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
 ;----------------------------------------------------------
         .DATA
 ROWS    EQU     8
-CLOUMNS EQU     12
+COLOUMNS EQU     12
 BLOCK_SIZE  EQU 25
 
 BLOCK   DW      ?, ?, ?     ;shows next blocks types
 POS     DW      ?           ;show current block head position
-BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?
+COLOR   DB      ?           ;show current block color
+BLOCKS  DW      96 DUP(?)
 ;----------------------------------------------------------
         .CODE
 MAIN    PROC    FAR
@@ -50,9 +40,30 @@ PRINT_MAP   PROC    NEAR
 ;		    if(BLOCKS[i, j] != 0)
 ;			    print(i, j);
 
-        MOV AX, 1
-        MOV BX, 1
-        JL  PRINT_BLOCK
+        MOV SI, OFFSET BLOCKS
+        XOR AX, AX          ;clear AX
+OUTER:
+        XOR BX, BX          ;clear BX
+INNER:
+        MOV CX, [SI]
+        MOV COLOR, CH
+        CMP CL, 0
+        JE  BREAK_IF
+        PUSH AX
+        PUSH BX
+        JMP PRINT_BLOCK
+END_PRINT_BLOCK:
+        POP BX
+        POP AX
+BREAK_IF:
+        ADD SI, 2
+        INC BX
+        CMP BX, ROWS
+        JL  INNER
+        INC AX
+        CMP AX, COLOUMNS
+        JL  OUTER
+        RET
 
 PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
         ;multiply i by 25
@@ -70,7 +81,7 @@ PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
         PUSH AX             ;push to use as a counter
 NEXT_COLOUMN:
         MOV AH,0CH          ;AH=OCH FUNCTION TO SET A PIXEL
-        MOV AL,12           ;PIXELS= LIGHT RED
+        MOV AL,COLOR        ;PIXELS= COLOR
         INT 10H             ;INVOKE INTERRUPT TO SET A PIXEL OF LINE
         INC CX              ;INCREMENT HORIZONTAL POSITION
         POP AX
@@ -84,7 +95,7 @@ NEXT_COLOUMN:
         CMP AX, 0           ;draw line width of 25px
         JNE NEXT_ROW
         POP AX
-        RET
+        JMP END_PRINT_BLOCK
 NEXT_ROW:
         POP AX              ;reset coloumn counter to 25
         MOV AL, BLOCK_SIZE
