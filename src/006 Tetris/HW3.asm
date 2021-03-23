@@ -5,6 +5,10 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
         .STACK 64
 ;----------------------------------------------------------
         .DATA
+ROWS    EQU     8
+CLOUMNS EQU     12
+BLOCK_SIZE  EQU 25
+
 BLOCK   DW      ?, ?, ?     ;shows next blocks types
 POS     DW      ?           ;show current block head position
 BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?
@@ -46,14 +50,23 @@ PRINT_MAP   PROC    NEAR
 ;		    if(BLOCKS[i, j] != 0)
 ;			    print(i, j);
 
-        MOV AX, 25
-        MOV BX, 25
+        MOV AX, 1
+        MOV BX, 1
         JL  PRINT_BLOCK
 
 PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
+        ;multiply i by 25
+;       MOV AX, AX
+        MOV CX, BLOCK_SIZE
+        MUL CX
         MOV CX, AX          ;start line coloumn = i
-        MOV DX, BX          ;row = j
-        MOV AX, 1919h       ;store 25 at AH and AL
+        ;multiply j by 25
+        MOV AX, BX
+        MOV DX, BLOCK_SIZE
+        MUL DX
+        MOV DX, AX          ;row = j
+        MOV AL, BLOCK_SIZE  ;store 25 at AL
+        MOV AH, BLOCK_SIZE  ;store 25 at AH
         PUSH AX             ;push to use as a counter
 NEXT_COLOUMN:
         MOV AH,0CH          ;AH=OCH FUNCTION TO SET A PIXEL
@@ -74,9 +87,9 @@ NEXT_COLOUMN:
         RET
 NEXT_ROW:
         POP AX              ;reset coloumn counter to 25
-        MOV AL, 25
+        MOV AL, BLOCK_SIZE
         PUSH AX
-        SUB CX, 25          ;reset line coloumn
+        SUB CX, BLOCK_SIZE  ;reset line coloumn
         ADD DX, 1           ;go to next row
         JMP NEXT_COLOUMN
 
