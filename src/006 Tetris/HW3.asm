@@ -12,7 +12,14 @@ BLOCK_SIZE  EQU 25
 BLOCK   DW      ?, ?, ?     ;shows next blocks types
 POS     DW      ?           ;show current block head position
 COLOR   DB      ?           ;show current block color
-BLOCKS  DW      96 DUP(?)
+BLOCKS  DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 ;----------------------------------------------------------
         .CODE
 MAIN    PROC    FAR
@@ -35,15 +42,15 @@ MAIN    ENDP
 ;----------------------------------------------------------
 PRINT_MAP   PROC    NEAR
 ; ↓↓ implement below logic ↓↓
-;   for i in 12:
-;	    for j in 8:
+;   for i in 8:
+;	    for j in 12:
 ;		    if(BLOCKS[i, j] != 0)
 ;			    print(i, j);
 
         MOV SI, OFFSET BLOCKS
-        XOR AX, AX          ;clear AX
-OUTER:
         XOR BX, BX          ;clear BX
+OUTER:
+        XOR AX, AX          ;clear AX
 INNER:
         MOV CX, [SI]
         MOV COLOR, CH
@@ -57,11 +64,11 @@ END_PRINT_BLOCK:
         POP AX
 BREAK_IF:
         ADD SI, 2
-        INC BX
-        CMP BX, ROWS
-        JL  INNER
         INC AX
         CMP AX, COLOUMNS
+        JL  INNER
+        INC BX
+        CMP BX, ROWS
         JL  OUTER
         RET
 
