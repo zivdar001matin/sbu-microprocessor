@@ -34,6 +34,8 @@ MAIN    PROC    FAR
         MOV AH,00           ;SET MODE
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
+        MOV AX, 2
+        CALL CLEAR_ROW
         CALL PRINT_MAP
         ;
         MOV     AH, 4CH     ;set up to
@@ -112,6 +114,69 @@ NEXT_ROW:
         JMP NEXT_COLOUMN
 
 PRINT_MAP   ENDP
+;----------------------------------------------------------
+CHECK_ROWS  PROC    NEAR
+; ↓↓ implement below logic ↓↓
+;   for row in BLOCKS:
+;       if all_elements_one(row)==1:
+;           clear_row(row)
+
+CHECK_ROWS  ENDP
+;----------------------------------------------------------
+CLEAR_ROW   PROC     NEAR
+; Arguments:
+;   AX: row to clear
+;
+; ↓↓ implement for below logic ↓↓
+;   for i in range(row, 1):
+;       row(i) = row(i-1)
+;   row(0) = OTHERS=>0
+
+        ;save registers
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH AX             ;multiply AX by 24
+        MOV BX, 24
+        MUL BX
+        MOV SI, OFFSET BLOCKS
+        ADD SI, AX          ;set SI to the first element of the row
+        POP AX
+START_CLEAR_ROW:
+        MOV CX, COLOUMNS    ;CX=12
+        CMP AX, 0
+        JE  END_CLEAR_ROW 
+RIGHT_COLOUMN:
+        CMP CX, 0
+        JE  UP_ROW
+        MOV BX, [SI-24]     ;move [SI-24] to [SI]
+        MOV [SI], BX
+        ADD SI, 2           ;move SI to the next element in the row
+        DEC CX              ;decreament coloumn counter
+        JMP RIGHT_COLOUMN
+UP_ROW:
+        SUB SI, 48          ;2*(2*12)
+        DEC AX              ;decreament row counter
+        JMP START_CLEAR_ROW
+END_CLEAR_ROW:
+        MOV SI, OFFSET BLOCKS
+        MOV CX, COLOUMNS    ;CX=12
+WHILE_FIRST_ROW:
+        CMP CX, 0
+        JE  END_WHILE_FIRST_ROW
+        MOV [SI], 0
+        ADD SI, 2           ;move SI to the next element in the row
+        DEC CX              ;decreament coloumn counter
+        JMP WHILE_FIRST_ROW
+END_WHILE_FIRST_ROW:
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+
+CLEAR_ROW   ENDP
 ;----------------------------------------------------------
 MOV_A  PROC     NEAR
         
