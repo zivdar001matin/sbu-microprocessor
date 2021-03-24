@@ -36,6 +36,7 @@ MAIN    PROC    FAR
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
         CALL CHECK_ROWS
+        CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         ;
         MOV     AH, 4CH     ;set up to
@@ -221,6 +222,66 @@ END_WHILE_FIRST_ROW:
         RET
 
 CLEAR_ROW   ENDP
+;----------------------------------------------------------
+CLEAR_EMPTY_ROWS  PROC     NEAR
+; Arguments:
+;   NONE
+;
+; ↓↓ implement below logic ↓↓
+;   for row in BLOCKS:              #to avoid infinite loop and simplicity in clearing zero lines at the bottom of blocks
+;       for row in BLOCKS:
+;           if all_elements_one(i)==1:
+;               clear_row(i)
+
+        ;save registers
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        MOV CX, 0           ;set CX as a row counter -> first loop
+FIRST_CLEAR_EMPTY_ROWS:
+        CMP CX, ROWS
+        JE  LAST_CLEAR_EMPTY_ROWS
+        PUSH CX
+        MOV CX, 0           ;set CX as a row counter -> second loop
+        MOV SI, OFFSET BLOCKS
+START_CLEAR_EMPTY_ROWS:
+        CMP CX, ROWS
+        JE  END_CLEAR_EMPTY_ROWS
+        PUSH CX             ;save row counter on stack
+        MOV CX, COLOUMNS    ;set CX as a coloumn counter
+        MOV AX, 0           ;set AX=0 to use as a flag
+START_CLEAR_EMPTY_ROW:
+        CMP CX, 0
+        JE  END_CLEAR_EMPTY_ROW
+        MOV BX, [SI]
+        OR  AX, BX          ;check if all elements in a row are equal to 0
+        DEC CX              ;decrease coloumn counter
+        ADD SI, 2           ;move SI to the next element in the row
+        JMP START_CLEAR_EMPTY_ROW
+END_CLEAR_EMPTY_ROW:
+        CMP AX, 0
+        JNE AFTER_CLEAR_EMPTY
+        POP CX              ;pop CX to become row counter to pass
+        MOV AX, CX          ;as AX for CLEAR_ROW
+        CALL CLEAR_ROW
+        PUSH CX
+AFTER_CLEAR_EMPTY:
+        POP CX
+        INC CX              ;increase row counter
+        JMP START_CLEAR_EMPTY_ROWS
+END_CLEAR_EMPTY_ROWS:
+        POP CX
+        INC CX
+        JMP FIRST_CLEAR_EMPTY_ROWS
+LAST_CLEAR_EMPTY_ROWS:
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+
+CLEAR_EMPTY_ROWS  ENDP
 ;----------------------------------------------------------
 MOV_A  PROC     NEAR
         
