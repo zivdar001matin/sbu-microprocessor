@@ -43,6 +43,9 @@ MAIN    PROC    FAR
 MAIN    ENDP
 ;----------------------------------------------------------
 PRINT_MAP   PROC    NEAR
+; ARGUMENTS:
+;   NONE
+;
 ; ↓↓ implement below logic ↓↓
 ;   for i in 8:
 ;	    for j in 12:
@@ -116,6 +119,9 @@ NEXT_ROW:
 PRINT_MAP   ENDP
 ;----------------------------------------------------------
 CHECK_ROWS  PROC    NEAR
+; ARGUMENTS:
+;   NONE
+;
 ; ↓↓ implement below logic ↓↓
 ;   for row in BLOCKS:
 ;       if all_elements_one(row)==1:
