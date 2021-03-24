@@ -13,9 +13,9 @@ BLOCK   DW      ?, ?, ?     ;shows next blocks types
 POS     DW      ?           ;show current block head position
 COLOR   DB      ?           ;show current block color
 BLOCKS  DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, 0D01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, 0F01h, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -35,7 +35,7 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
-        CALL CLEAR_ROW
+        CALL CHECK_ROWS
         CALL PRINT_MAP
         ;
         MOV     AH, 4CH     ;set up to
@@ -127,6 +127,44 @@ CHECK_ROWS  PROC    NEAR
 ;       if all_elements_one(row)==1:
 ;           clear_row(row)
 
+        ;save registers
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        MOV CX, 0           ;set CX as a row counter
+        MOV SI, OFFSET BLOCKS
+START_CHECK_ROWS:
+        CMP CX, ROWS
+        JE  END_CHECK_ROWS
+        PUSH CX             ;save row counter on stack
+        MOV CX, COLOUMNS    ;set CX as a coloumn counter
+        MOV AX, 1           ;set AX=1 to use as a flag
+START_CHECK_ROW:
+        CMP CX, 0
+        JE  END_CHECK_ROW
+        MOV BX, [SI]
+        AND AX, BX          ;check if all elements in a row are equal to 1
+        DEC CX              ;decrease coloumn counter
+        ADD SI, 2           ;move SI to the next element in the row
+        JMP START_CHECK_ROW
+END_CHECK_ROW:
+        CMP AX, 1
+        JNE AFTER_CLEAR
+        POP CX              ;pop CX to become row counter to pass
+        MOV AX, CX          ;as AX for CLEAR_ROW
+        CALL CLEAR_ROW
+        PUSH CX
+AFTER_CLEAR:
+        POP CX
+        INC CX              ;increase row counter
+        JMP START_CHECK_ROWS
+END_CHECK_ROWS:
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
 CHECK_ROWS  ENDP
 ;----------------------------------------------------------
 CLEAR_ROW   PROC     NEAR
