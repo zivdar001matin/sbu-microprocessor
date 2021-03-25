@@ -13,14 +13,14 @@ NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
 CURR_POS    DW      ?, ?, ?, ?  ;show current blocks position
 CURR_COLOR  DB      ?           ;show current block color
 CURR_TYPE   DW      ?           ;show current block type
-BLOCKS  DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
+BLOCKS  DW      0C01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
         DW      ?, 0D01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
         DW      ?, ?, ?, 0F01h, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 ;----------------------------------------------------------
         .CODE
 MAIN    PROC    FAR
@@ -134,6 +134,7 @@ CHECK_ROWS  PROC    NEAR
         PUSH BX
         PUSH CX
         PUSH DX
+        PUSH SI
         MOV CX, 0           ;set CX as a row counter
         MOV SI, OFFSET BLOCKS
 START_CHECK_ROWS:
@@ -162,6 +163,7 @@ AFTER_CLEAR:
         INC CX              ;increase row counter
         JMP START_CHECK_ROWS
 END_CHECK_ROWS:
+        POP SI
         POP DX
         POP CX
         POP BX
@@ -183,6 +185,7 @@ CLEAR_ROW   PROC     NEAR
         PUSH BX
         PUSH CX
         PUSH DX
+        PUSH SI
         PUSH AX             ;multiply AX by 24
         MOV BX, 24
         MUL BX
@@ -216,6 +219,7 @@ WHILE_FIRST_ROW:
         DEC CX              ;decreament coloumn counter
         JMP WHILE_FIRST_ROW
 END_WHILE_FIRST_ROW:
+        POP SI
         POP DX
         POP CX
         POP BX
@@ -261,7 +265,7 @@ START_CLEAR_EMPTY_ROW:
         ADD SI, 2           ;move SI to the next element in the row
         JMP START_CLEAR_EMPTY_ROW
 END_CLEAR_EMPTY_ROW:
-        CMP AX, 0
+        CMP AL, 0
         JNE AFTER_CLEAR_EMPTY
         POP CX              ;pop CX to become row counter to pass
         MOV AX, CX          ;as AX for CLEAR_ROW
