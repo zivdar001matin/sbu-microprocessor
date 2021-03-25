@@ -6,12 +6,13 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
 ;----------------------------------------------------------
         .DATA
 ROWS    EQU     8
-COLOUMNS EQU     12
-BLOCK_SIZE  EQU 25
+COLOUMNS    EQU     12
+BLOCK_SIZE  EQU     25
 
-BLOCK   DW      ?, ?, ?     ;shows next blocks types
-POS     DW      ?           ;show current block head position
-COLOR   DB      ?           ;show current block color
+NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
+CURR_POS    DW      ?, ?, ?, ?  ;show current blocks position
+CURR_COLOR  DB      ?           ;show current block color
+CURR_TYPE   DW      ?           ;show current block type
 BLOCKS  DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
         DW      ?, 0D01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
@@ -59,7 +60,7 @@ OUTER:
         XOR AX, AX          ;clear AX
 INNER:
         MOV CX, [SI]
-        MOV COLOR, CH
+        MOV CURR_COLOR, CH
         CMP CL, 0
         JE  BREAK_IF
         PUSH AX
@@ -94,7 +95,7 @@ PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
         PUSH AX             ;push to use as a counter
 NEXT_COLOUMN:
         MOV AH,0CH          ;AH=OCH FUNCTION TO SET A PIXEL
-        MOV AL,COLOR        ;PIXELS= COLOR
+        MOV AL,CURR_COLOR        ;PIXELS= COLOR
         INT 10H             ;INVOKE INTERRUPT TO SET A PIXEL OF LINE
         INC CX              ;INCREMENT HORIZONTAL POSITION
         POP AX
