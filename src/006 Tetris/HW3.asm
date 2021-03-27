@@ -53,9 +53,9 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
-        CALL MOV_RIGHT
+        ;CALL MOV_RIGHT
         ;CALL MOV_LEFT
-        ;CALL MOV_DOWN
+        CALL MOV_DOWN
         ;CALL CHECK_ROWS
         ;CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
@@ -423,8 +423,12 @@ DO_MOV_DOWN_LOOP:
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
         MOV BX, [SI]            ;move BLOCKS[house.y, house.x]
-        MOV [SI+COLOUMNS2], BX  ; to BLOCKS[house.y-1, house.x]
-        MOV [SI], 0             ; and set BLOCKS[house.y, house.x] to zero
+        DEC BL                  ;   (but before it, we decrease number
+        MOV [SI], BL            ;    of the current house)
+        MOV [SI+COLOUMNS2+1], BH  ; to BLOCKS[house.y-1, house.x]
+        MOV BL, [SI+COLOUMNS2]  ; and increase BLOCKS[house.y, house.x+1] number
+        INC BL                  ; of the current houses
+        MOV [SI+COLOUMNS2], BL
         DEC CX
         POP SI
         ADD SI, 2
@@ -541,8 +545,12 @@ DO_MOV_LEFT_LOOP:
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
         MOV BX, [SI]            ;move BLOCKS[house.y, house.x]
-        MOV [SI-2], BX          ; to BLOCKS[house.y, house.x-1]
-        MOV [SI], 0             ; and set BLOCKS[house.y, house.x] to zero
+        DEC BL                  ;   (but before it, we decrease number
+        MOV [SI], BL            ;    of the current house)
+        MOV [SI-1], BH          ; to BLOCKS[house.y, house.x-1]
+        MOV BL, [SI-2]          ; and increase BLOCKS[house.y, house.x+1] number
+        INC BL                  ; of the current houses
+        MOV [SI-2], BL
         DEC CX
         POP SI
         ADD SI, 2
@@ -666,10 +674,12 @@ DO_MOV_RIGHT_LOOP:
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
         MOV BX, [SI]            ;move color of BLOCKS[house.y, house.x]
-        INC BL                  ; (but before we increase it numbers)
-        MOV [SI+2], BX          ; to BLOCKS[house.y, house.x+1]
-        SUB BL, 2
-        MOV [SI], BX            ; and decrease BLOCKS[house.y, house.x] numbers
+        DEC BL                  ;   (but before it, we decrease number
+        MOV [SI], BL            ;    of the current house)
+        MOV [SI+3], BH          ; to BLOCKS[house.y, house.x+1]
+        MOV BL, [SI+2]          ; and increase BLOCKS[house.y, house.x+1] number
+        INC BL                  ; of the current houses
+        MOV [SI+2], BL
         DEC CX
         POP SI
         ADD SI, 2
