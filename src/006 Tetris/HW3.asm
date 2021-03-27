@@ -53,7 +53,8 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
-        CALL MOV_DOWN
+        CALL MOV_LEFT
+        ;CALL MOV_DOWN
         ;CALL CHECK_ROWS
         ;CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
@@ -439,5 +440,123 @@ END_MOV_DOWN:
         POP AX
         RET
 MOV_DOWN    ENDP
+;----------------------------------------------------------
+; to check if BLOCKS[i, j] is 1:
+;   [SI] + 24*i + 2*j
+MOV_LEFT    PROC     NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ;check if it is possible to move block left
+        CMP CURR_TYPE, TYPE_1_1
+            JE  CHECK_MOV_LEFT_TYPE_1_1
+        CMP CURR_TYPE, TYPE_1_2
+            JE  CHECK_MOV_LEFT_TYPE_1_2
+        CMP CURR_TYPE, TYPE_2_1
+            JE  CHECK_MOV_LEFT_TYPE_2_1
+        CMP CURR_TYPE, TYPE_3_1
+            JE  CHECK_MOV_LEFT_TYPE_3_1
+        CMP CURR_TYPE, TYPE_3_2
+            JE  CHECK_MOV_LEFT_TYPE_3_2
+        CMP CURR_TYPE, TYPE_3_3
+            JE  CHECK_MOV_LEFT_TYPE_3_3
+        CMP CURR_TYPE, TYPE_3_4
+            JE  CHECK_MOV_LEFT_TYPE_3_4
+        CMP CURR_TYPE, TYPE_4_1
+            JE  CHECK_MOV_LEFT_TYPE_4_1
+        CMP CURR_TYPE, TYPE_4_2
+            JE  CHECK_MOV_LEFT_TYPE_4_2
+        CMP CURR_TYPE, TYPE_5_1
+            JE  CHECK_MOV_LEFT_TYPE_5_1
+        CMP CURR_TYPE, TYPE_5_2
+            JE  CHECK_MOV_LEFT_TYPE_5_2
+        CMP CURR_TYPE, TYPE_5_3
+            JE  CHECK_MOV_LEFT_TYPE_5_3
+        CMP CURR_TYPE, TYPE_5_4
+            JE  CHECK_MOV_LEFT_TYPE_5_4
+
+CHECK_MOV_LEFT_TYPE_1_1:
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, 0               ;abort if is in the first coloumn 
+        JLE  ABORT_CHECK_LEFT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, -2              ;access block left to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_LEFT
+        JMP DO_MOV_LEFT
+
+
+CHECK_MOV_LEFT_TYPE_1_2:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_2_1:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_3_1:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_3_2:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_3_3:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_3_4:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_4_1:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_4_2:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_5_1:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_5_2:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_5_3:
+        ;TODO
+CHECK_MOV_LEFT_TYPE_5_4:
+        ;TODO
+
+; move down all of the current positions
+; for house in CURR_POS:
+;   BLOCKS[house.y, house.x-1] = BLOCKS[house.y, house.x]
+DO_MOV_LEFT:
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV CX, 4               ;CX is a house in block counter
+DO_MOV_LEFT_LOOP:
+        CMP CX, 0
+        JE  END_MOV_LEFT
+        PUSH SI                 ;save SI as a current CURR_POS
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        MOV BX, [SI]            ;move BLOCKS[house.y, house.x]
+        MOV [SI-2], BX          ; to BLOCKS[house.y, house.x-1]
+        MOV [SI], 0             ; and set BLOCKS[house.y, house.x] to zero
+        DEC CX
+        POP SI
+        ADD SI, 2
+        JMP DO_MOV_LEFT_LOOP
+
+ABORT_CHECK_LEFT:
+        ;TODO
+
+END_MOV_LEFT:
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+MOV_LEFT    ENDP
 ;----------------------------------------------------------
         END MAIN            ;this is the program exit point
