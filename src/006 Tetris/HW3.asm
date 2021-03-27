@@ -7,13 +7,30 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
         .DATA
 ROWS    EQU     8
 COLOUMNS    EQU     12
+COLOUMNS2   EQU     24          ;2*COLOUMNS
 BLOCK_SIZE  EQU     25
 
+; block type constants
+;          (read README):
+TYPE_1_1    EQU     0101h
+TYPE_1_2    EQU     0102h
+TYPE_2_1    EQU     0201h
+TYPE_3_1    EQU     0301h
+TYPE_3_2    EQU     0302h
+TYPE_3_3    EQU     0303h
+TYPE_3_4    EQU     0304h
+TYPE_4_1    EQU     0401h
+TYPE_4_2    EQU     0402h
+TYPE_5_1    EQU     0501h
+TYPE_5_2    EQU     0502h
+TYPE_5_3    EQU     0503h
+TYPE_5_4    EQU     0504h
+
 NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
-CURR_POS    DW      ?, ?, ?, ?  ;show current blocks position
+CURR_POS    DW      0004h, 0005h, 0006h, 0007h      ;show current blocks position
 CURR_COLOR  DB      ?           ;show current block color
-CURR_TYPE   DW      ?           ;show current block type
-BLOCKS  DW      0C01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+CURR_TYPE   DW      TYPE_1_1           ;show current block type
+BLOCKS  DW      ?, ?, ?, ?, 0901h, 0901h, 0901h, 0901h, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -36,8 +53,9 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
-        CALL CHECK_ROWS
-        CALL CLEAR_EMPTY_ROWS
+        CALL MOV_DOWN
+        ;CALL CHECK_ROWS
+        ;CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         ;
         MOV     AH, 4CH     ;set up to
@@ -288,8 +306,136 @@ LAST_CLEAR_EMPTY_ROWS:
 
 CLEAR_EMPTY_ROWS  ENDP
 ;----------------------------------------------------------
-MOV_A  PROC     NEAR
-        
-MOV_A  ENDP
+; to check if BLOCKS[i, j] is 1:
+;   [SI] + 24*i + 2*j      
+MOV_DOWN    PROC     NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ;check if it is possible to move block down
+        CMP CURR_TYPE, TYPE_1_1
+            JE  CHECK_MOV_DOWN_TYPE_1_1
+        CMP CURR_TYPE, TYPE_1_2
+            JE  CHECK_MOV_DOWN_TYPE_1_2
+        CMP CURR_TYPE, TYPE_2_1
+            JE  CHECK_MOV_DOWN_TYPE_2_1
+        CMP CURR_TYPE, TYPE_3_1
+            JE  CHECK_MOV_DOWN_TYPE_3_1
+        CMP CURR_TYPE, TYPE_3_2
+            JE  CHECK_MOV_DOWN_TYPE_3_2
+        CMP CURR_TYPE, TYPE_3_3
+            JE  CHECK_MOV_DOWN_TYPE_3_3
+        CMP CURR_TYPE, TYPE_3_4
+            JE  CHECK_MOV_DOWN_TYPE_3_4
+        CMP CURR_TYPE, TYPE_4_1
+            JE  CHECK_MOV_DOWN_TYPE_4_1
+        CMP CURR_TYPE, TYPE_4_2
+            JE  CHECK_MOV_DOWN_TYPE_4_2
+        CMP CURR_TYPE, TYPE_5_1
+            JE  CHECK_MOV_DOWN_TYPE_5_1
+        CMP CURR_TYPE, TYPE_5_2
+            JE  CHECK_MOV_DOWN_TYPE_5_2
+        CMP CURR_TYPE, TYPE_5_3
+            JE  CHECK_MOV_DOWN_TYPE_5_3
+        CMP CURR_TYPE, TYPE_5_4
+            JE  CHECK_MOV_DOWN_TYPE_5_4
+
+CHECK_MOV_DOWN_TYPE_1_1:
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BH, ROWS-1          ;anort if is in the last row 
+        JE  ABORT_CHECK_DOWN
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, COLOUMNS2       ;access block under the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_DOWN
+        ADD SI, 2               ;access block under the second block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_DOWN
+        ADD SI, 2               ;access block under the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_DOWN
+        ADD SI, 2               ;access block under the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_DOWN
+        JMP DO_MOV_DOWN
+
+
+CHECK_MOV_DOWN_TYPE_1_2:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_2_1:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_3_1:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_3_2:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_3_3:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_3_4:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_4_1:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_4_2:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_5_1:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_5_2:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_5_3:
+        ;TODO
+CHECK_MOV_DOWN_TYPE_5_4:
+        ;TODO
+
+        ;move block down
+
+; move down all of the current positions
+; for house in CURR_POS:
+;   BLOCKS[house.y, house.x] = BLOCKS[house.y-1, house.x]
+DO_MOV_DOWN:
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV CX, 4               ;CX is a house in block counter
+DO_MOV_DOWN_LOOP:
+        CMP CX, 0
+        JE  END_MOV
+        PUSH SI                 ;save SI as a current CURR_POS
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        MOV BX, [SI]            ;move BLOCKS[house.y, house.x]
+        MOV [SI+COLOUMNS2], BX  ; to BLOCKS[house.y-1, house.x]
+        MOV [SI], 0             ; and set BLOCKS[house.y, house.x] to zero
+        DEC CX
+        POP SI
+        ADD SI, 2
+        JMP DO_MOV_DOWN_LOOP
+
+ABORT_CHECK_DOWN:
+        ;TODO
+
+END_MOV:
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+MOV_DOWN    ENDP
 ;----------------------------------------------------------
         END MAIN            ;this is the program exit point
