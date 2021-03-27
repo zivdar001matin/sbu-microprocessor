@@ -261,6 +261,7 @@ CLEAR_EMPTY_ROWS  PROC     NEAR
         PUSH BX
         PUSH CX
         PUSH DX
+        PUSH SI
         MOV CX, 0           ;set CX as a row counter -> first loop
 FIRST_CLEAR_EMPTY_ROWS:
         CMP CX, ROWS
@@ -298,6 +299,7 @@ END_CLEAR_EMPTY_ROWS:
         INC CX
         JMP FIRST_CLEAR_EMPTY_ROWS
 LAST_CLEAR_EMPTY_ROWS:
+        POP SI
         POP DX
         POP CX
         POP BX
@@ -307,7 +309,7 @@ LAST_CLEAR_EMPTY_ROWS:
 CLEAR_EMPTY_ROWS  ENDP
 ;----------------------------------------------------------
 ; to check if BLOCKS[i, j] is 1:
-;   [SI] + 24*i + 2*j      
+;   [SI] + 24*i + 2*j
 MOV_DOWN    PROC     NEAR
         PUSH AX
         PUSH BX
@@ -402,13 +404,13 @@ CHECK_MOV_DOWN_TYPE_5_4:
 
 ; move down all of the current positions
 ; for house in CURR_POS:
-;   BLOCKS[house.y, house.x] = BLOCKS[house.y-1, house.x]
+;   BLOCKS[house.y-1, house.x] = BLOCKS[house.y, house.x]
 DO_MOV_DOWN:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
 DO_MOV_DOWN_LOOP:
         CMP CX, 0
-        JE  END_MOV
+        JE  END_MOV_DOWN
         PUSH SI                 ;save SI as a current CURR_POS
         MOV BX, [SI]            ;BH -> i and BL -> j
         XOR AX, AX              ;clear AX
@@ -429,7 +431,7 @@ DO_MOV_DOWN_LOOP:
 ABORT_CHECK_DOWN:
         ;TODO
 
-END_MOV:
+END_MOV_DOWN:
         POP SI
         POP DX
         POP CX
