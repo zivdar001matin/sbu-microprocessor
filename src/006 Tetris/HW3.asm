@@ -415,6 +415,10 @@ DO_MOV_DOWN_LOOP:
         JE  END_MOV_DOWN
         PUSH SI                 ;save SI as a current CURR_POS
         MOV BX, [SI]            ;BH -> i and BL -> j
+        PUSH BX                 ;update CURR_POS values
+        INC BH
+        MOV [SI], BX
+        POP BX
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -537,6 +541,10 @@ DO_MOV_LEFT_LOOP:
         JE  END_MOV_LEFT
         PUSH SI                 ;save SI as a current CURR_POS
         MOV BX, [SI]            ;BH -> i and BL -> j
+        PUSH BX                 ;update CURR_POS values
+        DEC BL
+        MOV [SI], BX
+        POP BX
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -666,6 +674,10 @@ DO_MOV_RIGHT_LOOP:
         JE  END_MOV_LEFT
         PUSH SI                 ;save SI as a current CURR_POS
         MOV BX, [SI]            ;BH -> i and BL -> j
+        PUSH BX                 ;update CURR_POS values
+        INC BL
+        MOV [SI], BX
+        POP BX
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
