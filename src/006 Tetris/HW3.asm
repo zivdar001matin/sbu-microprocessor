@@ -200,6 +200,8 @@ NEXT_ROW:
 PRINT_MAP   ENDP
 ;----------------------------------------------------------
 CHECK_ROWS  PROC    NEAR
+;Check if any row in the map is full of blocks, then clear it.
+;
 ; ARGUMENTS:
 ;   NONE
 ;
@@ -251,6 +253,10 @@ END_CHECK_ROWS:
 CHECK_ROWS  ENDP
 ;----------------------------------------------------------
 CLEAR_ROW   PROC     NEAR
+;
+;Before clearing, push CURR_POS block to the stack and pop
+;   it after clearing row
+;
 ; Arguments:
 ;   AX: row to clear
 ;
@@ -266,7 +272,7 @@ CLEAR_ROW   PROC     NEAR
         PUSH DX
         PUSH SI
         PUSH AX             ;multiply AX by 24
-        MOV BX, 24
+        MOV BX, 2*COLOUMNS
         MUL BX
         MOV SI, OFFSET BLOCKS
         ADD SI, AX          ;set SI to the first element of the row
@@ -278,13 +284,13 @@ START_CLEAR_ROW:
 RIGHT_COLOUMN:
         CMP CX, 0
         JE  UP_ROW
-        MOV BX, [SI-24]     ;move [SI-24] to [SI]
+        MOV BX, [SI-2*COLOUMNS]     ;move [SI-24] to [SI]
         MOV [SI], BX
         ADD SI, 2           ;move SI to the next element in the row
         DEC CX              ;decreament coloumn counter
         JMP RIGHT_COLOUMN
 UP_ROW:
-        SUB SI, 48          ;2*(2*12)
+        SUB SI, 2*2*COLOUMNS          ;2*(2*12)
         DEC AX              ;decreament row counter
         JMP START_CLEAR_ROW
 END_CLEAR_ROW:
@@ -683,7 +689,7 @@ CHECK_MOV_RIGHT_TYPE_1_1:
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        ADD SI, 8               ;access block left to the last block position
+        ADD SI, 2               ;access block right to the last block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_RIGHT
