@@ -673,7 +673,7 @@ MOV_RIGHT   PROC    NEAR
 
 CHECK_MOV_RIGHT_TYPE_1_1:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI]            ;BH -> i and BL -> j
+        MOV BX, [SI+6]          ;BH -> i and BL -> j
         CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
         JGE ABORT_CHECK_RIGHT
         XOR AX, AX              ;clear AX
