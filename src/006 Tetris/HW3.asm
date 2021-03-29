@@ -28,6 +28,7 @@ TYPE_5_4    EQU     0504h
 
 NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
 CURR_POS    DW      0004h, 0005h, 0006h, 0007h      ;show current blocks position
+CURR_DIR    DB      ?           ;show current block move direction
 CURR_COLOR  DB      ?           ;show current block color
 CURR_TYPE   DW      TYPE_1_1           ;show current block type
 BLOCKS  DW      ?, ?, ?, ?, 0901h, 0901h, 0901h, 0901h, ?, ?, ?, ?
@@ -53,16 +54,74 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
+        JMP GAME_LOOP
         ;CALL MOV_RIGHT
         ;CALL MOV_LEFT
-        CALL MOV_DOWN
+        ;CALL MOV_DOWN
         ;CALL CHECK_ROWS
         ;CALL CLEAR_EMPTY_ROWS
+        ;CALL PRINT_MAP
+        ;
+
+GAME_LOOP:
+        ; check for player commands:
+        MOV     AH, 01h
+        INT     16h
+        JZ      NO_KEY
+        MOV AH, 00h
+        INT 16h
+        CMP AL, 1Bh         ; esc - key?
+        JE  STOP_GAME       ;
+        MOV CURR_DIR, AL
+        CALL MOV_BLOCK     ;todo
+        ;
+        MOV AX,0600H        ;SCROLL THE SCREEN
+        MOV BH,07           ;NORMALATIRIBUTE
+        MOV CX,0000         ;FROM ROW=OO,COLUMN=OO
+        MOV DX,184FH        ;TO ROW=18H,COLUMN=4FH
+        INT 10H             ;INVOKE INTERRUPT TO CLEAR SCREEN
+        MOV AH,00           ;SET MODE
+        MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
+        INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
+        ;
+NO_KEY:
+        MOV AX, 2
+        ; CALL CHECK_ROWS
+        ; CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         ;
+        JMP GAME_LOOP
+STOP_GAME:
         MOV     AH, 4CH     ;set up to
         INT     21H
 MAIN    ENDP
+;----------------------------------------------------------
+;move block to the current direction
+;ALGORITHM : call existing procedures
+;PARAMETERS : current direction saved in the CURR_DIR
+MOV_BLOCK   PROC    NEAR
+        PUSH AX
+        MOV AL, CURR_DIR
+        CMP AL, 97              ;compare current input with 'a'
+        JE  MOV_BLOCK_LEFT
+        CMP AL, 115             ;compare current input with 's'
+        JE  MOV_BLOCK_DOWN
+        CMP AL, 100             ;compare current input with 'd'
+        JE  MOV_BLOCK_RIGHT
+        JMP MOV_BLOCK_END
+MOV_BLOCK_LEFT:
+        CALL MOV_LEFT
+        JMP MOV_BLOCK_END
+MOV_BLOCK_DOWN:
+        CALL MOV_DOWN
+        JMP MOV_BLOCK_END
+MOV_BLOCK_RIGHT:
+        CALL MOV_RIGHT
+        JMP MOV_BLOCK_END
+MOV_BLOCK_END:
+        POP AX
+        RET
+MOV_BLOCK   ENDP
 ;----------------------------------------------------------
 PRINT_MAP   PROC    NEAR
 ; ARGUMENTS:
