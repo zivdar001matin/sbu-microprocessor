@@ -28,6 +28,7 @@ TYPE_5_4    EQU     0504h
 
 NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
 CURR_POS    DW      0004h, 0005h, 0006h, 0007h      ;show current blocks position
+CURR_POS_STACK  DW    ?, ?, ?, ?    ;use as memory to save current block colour and number
 CURR_DIR    DB      ?           ;show current block move direction
 CURR_COLOR  DB      ?           ;show current block color
 CURR_TYPE   DW      TYPE_1_1           ;show current block type
@@ -86,8 +87,8 @@ GAME_LOOP:
         ;
 NO_KEY:
         MOV AX, 2
-        ; CALL CHECK_ROWS
-        ; CALL CLEAR_EMPTY_ROWS
+        CALL CHECK_ROWS
+        CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         ;
         JMP GAME_LOOP
@@ -265,6 +266,7 @@ CLEAR_ROW   PROC     NEAR
 ;       row(i) = row(i-1)
 ;   row(0) = OTHERS=>0
 
+        CALL PUSH_CURR_POS
         ;save registers
         PUSH AX
         PUSH BX
@@ -309,6 +311,7 @@ END_WHILE_FIRST_ROW:
         POP CX
         POP BX
         POP AX
+        CALL POP_CURR_POS
         RET
 
 CLEAR_ROW   ENDP
@@ -773,5 +776,94 @@ END_MOV_RIGHT:
         POP AX
         RET
 MOV_RIGHT    ENDP
+;----------------------------------------------------------
+;Vanish current block from map
+;   Read-also: POP_CURR_POS
+PUSH_CURR_POS   PROC    NEAR
+        ;
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ;
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV CX, 4               ;CX is a house in block counter
+PUSH_CURR_POS_LOOP:
+        CMP CX, 0
+        JE  END_PUSH_CURR_POS
+        PUSH SI                 ;save SI as a current CURR_POS
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        MOV AX, [SI]
+        MOV [SI], 0000h         ;clear block in CURR_POS's map
+        MOV SI, OFFSET CURR_POS_STACK
+        ADD SI, CX              ;write it twice because it is stored in double word
+        ADD SI, CX              ; like SI+2
+        SUB SI, 2               ;offset because CX start from 4 and goes to 1
+        MOV [SI], AX            ;push to CURR_POS_STACK
+        DEC CX
+        POP SI
+        ADD SI, 2
+        JMP PUSH_CURR_POS_LOOP
+END_PUSH_CURR_POS:
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+PUSH_CURR_POS   ENDP
+;----------------------------------------------------------
+;Retrieve current block from CURR_POS_STACK
+;   Read-also: PUSH_CURR_POS
+POP_CURR_POS   PROC    NEAR
+        ;
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ;
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV CX, 4               ;CX is a house in block counter
+POP_CURR_POS_LOOP:
+        CMP CX, 0
+        JE  END_POP_CURR_POS
+        PUSH SI                 ;save SI as a current CURR_POS
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET CURR_POS_STACK
+        ADD SI, CX              ;write it twice because it is stored in double word
+        ADD SI, CX              ; like SI+2
+        SUB SI, 2               ;offset because CX start from 4 and goes to 1
+        MOV BX, [SI]            ;pop from CURR_POS_STACK
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        MOV [SI], BX
+        DEC CX
+        POP SI
+        ADD SI, 2
+        JMP POP_CURR_POS_LOOP
+END_POP_CURR_POS:
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+POP_CURR_POS   ENDP
 ;----------------------------------------------------------
         END MAIN            ;this is the program exit point
