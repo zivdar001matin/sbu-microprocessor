@@ -5,7 +5,7 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
         .STACK 64
 ;----------------------------------------------------------
         .DATA
-ROWS    EQU     8
+ROWS        EQU     8
 COLOUMNS    EQU     12
 COLOUMNS2   EQU     24          ;2*COLOUMNS
 BLOCK_SIZE  EQU     25
@@ -64,7 +64,7 @@ MAIN    PROC    FAR
         ;CALL PRINT_MAP
         ;
 
-GAME_LOOP:
+    GAME_LOOP:
         ; check for player commands:
         MOV     AH, 01h
         INT     16h
@@ -85,14 +85,14 @@ GAME_LOOP:
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         ;
-NO_KEY:
+    NO_KEY:
         MOV AX, 2
         CALL CHECK_ROWS
         CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         ;
         JMP GAME_LOOP
-STOP_GAME:
+    STOP_GAME:
         MOV     AH, 4CH     ;set up to
         INT     21H
 MAIN    ENDP
@@ -110,21 +110,20 @@ MOV_BLOCK   PROC    NEAR
         CMP AL, 100             ;compare current input with 'd'
         JE  MOV_BLOCK_RIGHT
         JMP MOV_BLOCK_END
-MOV_BLOCK_LEFT:
+    MOV_BLOCK_LEFT:
         CALL MOV_LEFT
         JMP MOV_BLOCK_END
-MOV_BLOCK_DOWN:
+    MOV_BLOCK_DOWN:
         CALL MOV_DOWN
         JMP MOV_BLOCK_END
-MOV_BLOCK_RIGHT:
+    MOV_BLOCK_RIGHT:
         CALL MOV_RIGHT
         JMP MOV_BLOCK_END
-MOV_BLOCK_END:
+    MOV_BLOCK_END:
         POP AX
         RET
 MOV_BLOCK   ENDP
 ;----------------------------------------------------------
-PRINT_MAP   PROC    NEAR
 ; ARGUMENTS:
 ;   NONE
 ;
@@ -133,12 +132,13 @@ PRINT_MAP   PROC    NEAR
 ;	    for j in 12:
 ;		    if(BLOCKS[i, j] != 0)
 ;			    print(i, j);
+PRINT_MAP   PROC    NEAR
 
         MOV SI, OFFSET BLOCKS
         XOR BX, BX          ;clear BX
-OUTER:
+    OUTER:
         XOR AX, AX          ;clear AX
-INNER:
+    INNER:
         MOV CX, [SI]
         MOV CURR_COLOR, CH
         CMP CL, 0
@@ -146,10 +146,10 @@ INNER:
         PUSH AX
         PUSH BX
         JMP PRINT_BLOCK
-END_PRINT_BLOCK:
+    END_PRINT_BLOCK:
         POP BX
         POP AX
-BREAK_IF:
+    BREAK_IF:
         ADD SI, 2
         INC AX
         CMP AX, COLOUMNS
@@ -159,9 +159,9 @@ BREAK_IF:
         JL  OUTER
         RET
 
-PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
+    PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
         ;multiply i by 25
-;       MOV AX, AX
+        ;MOV AX, AX
         MOV CX, BLOCK_SIZE
         MUL CX
         MOV CX, AX          ;start line coloumn = i
@@ -173,7 +173,7 @@ PRINT_BLOCK:                ;print block(i, j) where AX->i and BX->j
         MOV AL, BLOCK_SIZE  ;store 25 at AL
         MOV AH, BLOCK_SIZE  ;store 25 at AH
         PUSH AX             ;push to use as a counter
-NEXT_COLOUMN:
+    NEXT_COLOUMN:
         MOV AH,0CH          ;AH=OCH FUNCTION TO SET A PIXEL
         MOV AL,CURR_COLOR        ;PIXELS= COLOR
         INT 10H             ;INVOKE INTERRUPT TO SET A PIXEL OF LINE
@@ -190,7 +190,7 @@ NEXT_COLOUMN:
         JNE NEXT_ROW
         POP AX
         JMP END_PRINT_BLOCK
-NEXT_ROW:
+    NEXT_ROW:
         POP AX              ;reset coloumn counter to 25
         MOV AL, BLOCK_SIZE
         PUSH AX
@@ -200,7 +200,6 @@ NEXT_ROW:
 
 PRINT_MAP   ENDP
 ;----------------------------------------------------------
-CHECK_ROWS  PROC    NEAR
 ;Check if any row in the map is full of blocks, then clear it.
 ;
 ; ARGUMENTS:
@@ -210,6 +209,7 @@ CHECK_ROWS  PROC    NEAR
 ;   for row in BLOCKS:
 ;       if all_elements_one(row)==1:
 ;           clear_row(row)
+CHECK_ROWS  PROC    NEAR
 
         ;save registers
         PUSH AX
@@ -219,13 +219,13 @@ CHECK_ROWS  PROC    NEAR
         PUSH SI
         MOV CX, 0           ;set CX as a row counter
         MOV SI, OFFSET BLOCKS
-START_CHECK_ROWS:
+    START_CHECK_ROWS:
         CMP CX, ROWS
         JE  END_CHECK_ROWS
         PUSH CX             ;save row counter on stack
         MOV CX, COLOUMNS    ;set CX as a coloumn counter
         MOV AX, 1           ;set AX=1 to use as a flag
-START_CHECK_ROW:
+    START_CHECK_ROW:
         CMP CX, 0
         JE  END_CHECK_ROW
         MOV BX, [SI]
@@ -233,18 +233,18 @@ START_CHECK_ROW:
         DEC CX              ;decrease coloumn counter
         ADD SI, 2           ;move SI to the next element in the row
         JMP START_CHECK_ROW
-END_CHECK_ROW:
+    END_CHECK_ROW:
         CMP AX, 1
         JNE AFTER_CLEAR
         POP CX              ;pop CX to become row counter to pass
         MOV AX, CX          ;as AX for CLEAR_ROW
         CALL CLEAR_ROW
         PUSH CX
-AFTER_CLEAR:
+    AFTER_CLEAR:
         POP CX
         INC CX              ;increase row counter
         JMP START_CHECK_ROWS
-END_CHECK_ROWS:
+    END_CHECK_ROWS:
         POP SI
         POP DX
         POP CX
@@ -253,8 +253,6 @@ END_CHECK_ROWS:
         RET
 CHECK_ROWS  ENDP
 ;----------------------------------------------------------
-CLEAR_ROW   PROC     NEAR
-;
 ;Before clearing, push CURR_POS block to the stack and pop
 ;   it after clearing row
 ;
@@ -265,6 +263,7 @@ CLEAR_ROW   PROC     NEAR
 ;   for i in range(row, 1):
 ;       row(i) = row(i-1)
 ;   row(0) = OTHERS=>0
+CLEAR_ROW   PROC     NEAR
 
         CALL PUSH_CURR_POS
         ;save registers
@@ -279,11 +278,11 @@ CLEAR_ROW   PROC     NEAR
         MOV SI, OFFSET BLOCKS
         ADD SI, AX          ;set SI to the first element of the row
         POP AX
-START_CLEAR_ROW:
+    START_CLEAR_ROW:
         MOV CX, COLOUMNS    ;CX=12
         CMP AX, 0
         JE  END_CLEAR_ROW 
-RIGHT_COLOUMN:
+    RIGHT_COLOUMN:
         CMP CX, 0
         JE  UP_ROW
         MOV BX, [SI-2*COLOUMNS]     ;move [SI-24] to [SI]
@@ -291,21 +290,21 @@ RIGHT_COLOUMN:
         ADD SI, 2           ;move SI to the next element in the row
         DEC CX              ;decreament coloumn counter
         JMP RIGHT_COLOUMN
-UP_ROW:
+    UP_ROW:
         SUB SI, 2*2*COLOUMNS          ;2*(2*12)
         DEC AX              ;decreament row counter
         JMP START_CLEAR_ROW
-END_CLEAR_ROW:
+    END_CLEAR_ROW:
         MOV SI, OFFSET BLOCKS
         MOV CX, COLOUMNS    ;CX=12
-WHILE_FIRST_ROW:
+    WHILE_FIRST_ROW:
         CMP CX, 0
         JE  END_WHILE_FIRST_ROW
         MOV [SI], 0
         ADD SI, 2           ;move SI to the next element in the row
         DEC CX              ;decreament coloumn counter
         JMP WHILE_FIRST_ROW
-END_WHILE_FIRST_ROW:
+    END_WHILE_FIRST_ROW:
         POP SI
         POP DX
         POP CX
@@ -316,7 +315,6 @@ END_WHILE_FIRST_ROW:
 
 CLEAR_ROW   ENDP
 ;----------------------------------------------------------
-CLEAR_EMPTY_ROWS  PROC     NEAR
 ; Arguments:
 ;   NONE
 ;
@@ -325,6 +323,7 @@ CLEAR_EMPTY_ROWS  PROC     NEAR
 ;       for row in BLOCKS:
 ;           if all_elements_one(i)==1:
 ;               clear_row(i)
+CLEAR_EMPTY_ROWS  PROC     NEAR
 
         ;save registers
         PUSH AX
@@ -333,19 +332,19 @@ CLEAR_EMPTY_ROWS  PROC     NEAR
         PUSH DX
         PUSH SI
         MOV CX, 0           ;set CX as a row counter -> first loop
-FIRST_CLEAR_EMPTY_ROWS:
+    FIRST_CLEAR_EMPTY_ROWS:
         CMP CX, ROWS
         JE  LAST_CLEAR_EMPTY_ROWS
         PUSH CX
         MOV CX, 0           ;set CX as a row counter -> second loop
         MOV SI, OFFSET BLOCKS
-START_CLEAR_EMPTY_ROWS:
+    START_CLEAR_EMPTY_ROWS:
         CMP CX, ROWS
         JE  END_CLEAR_EMPTY_ROWS
         PUSH CX             ;save row counter on stack
         MOV CX, COLOUMNS    ;set CX as a coloumn counter
         MOV AX, 0           ;set AX=0 to use as a flag
-START_CLEAR_EMPTY_ROW:
+    START_CLEAR_EMPTY_ROW:
         CMP CX, 0
         JE  END_CLEAR_EMPTY_ROW
         MOV BX, [SI]
@@ -353,22 +352,22 @@ START_CLEAR_EMPTY_ROW:
         DEC CX              ;decrease coloumn counter
         ADD SI, 2           ;move SI to the next element in the row
         JMP START_CLEAR_EMPTY_ROW
-END_CLEAR_EMPTY_ROW:
+    END_CLEAR_EMPTY_ROW:
         CMP AL, 0
         JNE AFTER_CLEAR_EMPTY
         POP CX              ;pop CX to become row counter to pass
         MOV AX, CX          ;as AX for CLEAR_ROW
         CALL CLEAR_ROW
         PUSH CX
-AFTER_CLEAR_EMPTY:
+    AFTER_CLEAR_EMPTY:
         POP CX
         INC CX              ;increase row counter
         JMP START_CLEAR_EMPTY_ROWS
-END_CLEAR_EMPTY_ROWS:
+    END_CLEAR_EMPTY_ROWS:
         POP CX
         INC CX
         JMP FIRST_CLEAR_EMPTY_ROWS
-LAST_CLEAR_EMPTY_ROWS:
+    LAST_CLEAR_EMPTY_ROWS:
         POP SI
         POP DX
         POP CX
@@ -414,7 +413,7 @@ MOV_DOWN    PROC     NEAR
         CMP CURR_TYPE, TYPE_5_4
             JE  CHECK_MOV_DOWN_TYPE_5_4
 
-CHECK_MOV_DOWN_TYPE_1_1:
+    CHECK_MOV_DOWN_TYPE_1_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -445,7 +444,7 @@ CHECK_MOV_DOWN_TYPE_1_1:
         JMP DO_MOV_DOWN
 
 
-CHECK_MOV_DOWN_TYPE_1_2:
+    CHECK_MOV_DOWN_TYPE_1_2:
         MOV SI, OFFSET CURR_POS ;first block position
         ADD SI, 6               ;last block position
         MOV BX, [SI]            ;BH -> i and BL -> j
@@ -464,7 +463,7 @@ CHECK_MOV_DOWN_TYPE_1_2:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_2_1:
+    CHECK_MOV_DOWN_TYPE_2_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]          ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -486,7 +485,7 @@ CHECK_MOV_DOWN_TYPE_2_1:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_3_1:
+    CHECK_MOV_DOWN_TYPE_3_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]          ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -508,7 +507,7 @@ CHECK_MOV_DOWN_TYPE_3_1:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_3_2:
+    CHECK_MOV_DOWN_TYPE_3_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+2]          ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -535,7 +534,7 @@ CHECK_MOV_DOWN_TYPE_3_2:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_3_3:
+    CHECK_MOV_DOWN_TYPE_3_3:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -558,7 +557,7 @@ CHECK_MOV_DOWN_TYPE_3_3:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_3_4:
+    CHECK_MOV_DOWN_TYPE_3_4:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -583,7 +582,7 @@ CHECK_MOV_DOWN_TYPE_3_4:
         CMP AL, 1
         JE  ABORT_CHECK_DOWN
 
-CHECK_MOV_DOWN_TYPE_4_1:
+    CHECK_MOV_DOWN_TYPE_4_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+2]          ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -606,7 +605,7 @@ CHECK_MOV_DOWN_TYPE_4_1:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_4_2:
+    CHECK_MOV_DOWN_TYPE_4_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -633,7 +632,7 @@ CHECK_MOV_DOWN_TYPE_4_2:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_5_1:
+    CHECK_MOV_DOWN_TYPE_5_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -661,7 +660,7 @@ CHECK_MOV_DOWN_TYPE_5_1:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_5_2:
+    CHECK_MOV_DOWN_TYPE_5_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]          ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -684,7 +683,7 @@ CHECK_MOV_DOWN_TYPE_5_2:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-CHECK_MOV_DOWN_TYPE_5_3:
+    CHECK_MOV_DOWN_TYPE_5_3:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -709,7 +708,7 @@ CHECK_MOV_DOWN_TYPE_5_3:
         CMP AL, 1
         JE  ABORT_CHECK_DOWN
 
-CHECK_MOV_DOWN_TYPE_5_4:
+    CHECK_MOV_DOWN_TYPE_5_4:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
@@ -732,13 +731,13 @@ CHECK_MOV_DOWN_TYPE_5_4:
         JE  ABORT_CHECK_DOWN
         JMP DO_MOV_DOWN
 
-; move down all of the current positions
-; for house in CURR_POS:
-;   BLOCKS[house.y-1, house.x] = BLOCKS[house.y, house.x]
-DO_MOV_DOWN:
+    ; move down all of the current positions
+    ; for house in CURR_POS:
+    ;   BLOCKS[house.y-1, house.x] = BLOCKS[house.y, house.x]
+    DO_MOV_DOWN:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
-DO_MOV_DOWN_LOOP:
+    DO_MOV_DOWN_LOOP:
         CMP CX, 0
         JE  END_MOV_DOWN
         PUSH SI                 ;save SI as a current CURR_POS
@@ -766,10 +765,10 @@ DO_MOV_DOWN_LOOP:
         ADD SI, 2
         JMP DO_MOV_DOWN_LOOP
 
-ABORT_CHECK_DOWN:
+    ABORT_CHECK_DOWN:
         ;TODO
 
-END_MOV_DOWN:
+    END_MOV_DOWN:
         POP SI
         POP DX
         POP CX
@@ -814,7 +813,7 @@ MOV_LEFT    PROC     NEAR
         CMP CURR_TYPE, TYPE_5_4
             JE  CHECK_MOV_LEFT_TYPE_5_4
 
-CHECK_MOV_LEFT_TYPE_1_1:
+    CHECK_MOV_LEFT_TYPE_1_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn 
@@ -833,7 +832,7 @@ CHECK_MOV_LEFT_TYPE_1_1:
         JMP DO_MOV_LEFT
 
 
-CHECK_MOV_LEFT_TYPE_1_2:
+    CHECK_MOV_LEFT_TYPE_1_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn 
@@ -863,7 +862,7 @@ CHECK_MOV_LEFT_TYPE_1_2:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_2_1:
+    CHECK_MOV_LEFT_TYPE_2_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn 
@@ -885,7 +884,7 @@ CHECK_MOV_LEFT_TYPE_2_1:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_3_1:
+    CHECK_MOV_LEFT_TYPE_3_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -911,7 +910,7 @@ CHECK_MOV_LEFT_TYPE_3_1:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_3_2:
+    CHECK_MOV_LEFT_TYPE_3_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -933,7 +932,7 @@ CHECK_MOV_LEFT_TYPE_3_2:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_3_3:
+    CHECK_MOV_LEFT_TYPE_3_3:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -960,7 +959,7 @@ CHECK_MOV_LEFT_TYPE_3_3:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_3_4:
+    CHECK_MOV_LEFT_TYPE_3_4:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -983,7 +982,7 @@ CHECK_MOV_LEFT_TYPE_3_4:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_4_1:
+    CHECK_MOV_LEFT_TYPE_4_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1010,7 +1009,7 @@ CHECK_MOV_LEFT_TYPE_4_1:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_4_2:
+    CHECK_MOV_LEFT_TYPE_4_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+2]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1033,7 +1032,7 @@ CHECK_MOV_LEFT_TYPE_4_2:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_5_1:
+    CHECK_MOV_LEFT_TYPE_5_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1056,7 +1055,7 @@ CHECK_MOV_LEFT_TYPE_5_1:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_5_2:
+    CHECK_MOV_LEFT_TYPE_5_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+4]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1084,7 +1083,7 @@ CHECK_MOV_LEFT_TYPE_5_2:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_5_3:
+    CHECK_MOV_LEFT_TYPE_5_3:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1107,7 +1106,7 @@ CHECK_MOV_LEFT_TYPE_5_3:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-CHECK_MOV_LEFT_TYPE_5_4:
+    CHECK_MOV_LEFT_TYPE_5_4:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
@@ -1133,13 +1132,13 @@ CHECK_MOV_LEFT_TYPE_5_4:
         JE  ABORT_CHECK_LEFT
         JMP DO_MOV_LEFT
 
-; move down all of the current positions
-; for house in CURR_POS:
-;   BLOCKS[house.y, house.x-1] = BLOCKS[house.y, house.x]
-DO_MOV_LEFT:
+    ; move down all of the current positions
+    ; for house in CURR_POS:
+    ;   BLOCKS[house.y, house.x-1] = BLOCKS[house.y, house.x]
+    DO_MOV_LEFT:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
-DO_MOV_LEFT_LOOP:
+    DO_MOV_LEFT_LOOP:
         CMP CX, 0
         JE  END_MOV_LEFT
         PUSH SI                 ;save SI as a current CURR_POS
@@ -1167,10 +1166,10 @@ DO_MOV_LEFT_LOOP:
         ADD SI, 2
         JMP DO_MOV_LEFT_LOOP
 
-ABORT_CHECK_LEFT:
+    ABORT_CHECK_LEFT:
         ;TODO
 
-END_MOV_LEFT:
+    END_MOV_LEFT:
         POP SI
         POP DX
         POP CX
@@ -1215,7 +1214,7 @@ MOV_RIGHT   PROC    NEAR
         CMP CURR_TYPE, TYPE_5_4
             JE  CHECK_MOV_RIGHT_TYPE_5_4
 
-CHECK_MOV_RIGHT_TYPE_1_1:
+    CHECK_MOV_RIGHT_TYPE_1_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+6]          ;BH -> i and BL -> j
         CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
@@ -1234,7 +1233,7 @@ CHECK_MOV_RIGHT_TYPE_1_1:
         JMP DO_MOV_RIGHT
 
 
-CHECK_MOV_RIGHT_TYPE_1_2:
+    CHECK_MOV_RIGHT_TYPE_1_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
@@ -1264,7 +1263,7 @@ CHECK_MOV_RIGHT_TYPE_1_2:
         JE  ABORT_CHECK_RIGHT
         JMP DO_MOV_RIGHT
 
-CHECK_MOV_RIGHT_TYPE_2_1:
+    CHECK_MOV_RIGHT_TYPE_2_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI+2]            ;BH -> i and BL -> j
         CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
@@ -1286,41 +1285,41 @@ CHECK_MOV_RIGHT_TYPE_2_1:
         JE  ABORT_CHECK_RIGHT
         JMP DO_MOV_RIGHT
 
-CHECK_MOV_RIGHT_TYPE_3_1:
+    CHECK_MOV_RIGHT_TYPE_3_1:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_3_2:
+    CHECK_MOV_RIGHT_TYPE_3_2:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_3_3:
+    CHECK_MOV_RIGHT_TYPE_3_3:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_3_4:
+    CHECK_MOV_RIGHT_TYPE_3_4:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_4_1:
+    CHECK_MOV_RIGHT_TYPE_4_1:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_4_2:
+    CHECK_MOV_RIGHT_TYPE_4_2:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_5_1:
+    CHECK_MOV_RIGHT_TYPE_5_1:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_5_2:
+    CHECK_MOV_RIGHT_TYPE_5_2:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_5_3:
+    CHECK_MOV_RIGHT_TYPE_5_3:
         ;TODO
-CHECK_MOV_RIGHT_TYPE_5_4:
+    CHECK_MOV_RIGHT_TYPE_5_4:
         ;TODO
 
-; move down all of the current positions
-; for house in CURR_POS:
-;   BLOCKS[house.y, house.x+1] = BLOCKS[house.y, house.x]
-;
-; prevent block self-destruction bug by this new idea:
-;   when shift block to right, we do not change 1 to 0 or 0 to 1. but we
-;   increase and decrease so that we can manage moving blocks in any direction.
-;       (we can have number 2 addition to the 0 and 1 that shows we have 
-;        overlapping houses of a block)
-;
-DO_MOV_RIGHT:
+    ; move down all of the current positions
+    ; for house in CURR_POS:
+    ;   BLOCKS[house.y, house.x+1] = BLOCKS[house.y, house.x]
+    ;
+    ; prevent block self-destruction bug by this new idea:
+    ;   when shift block to right, we do not change 1 to 0 or 0 to 1. but we
+    ;   increase and decrease so that we can manage moving blocks in any direction.
+    ;       (we can have number 2 addition to the 0 and 1 that shows we have 
+    ;        overlapping houses of a block)
+    ;
+    DO_MOV_RIGHT:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
-DO_MOV_RIGHT_LOOP:
+    DO_MOV_RIGHT_LOOP:
         CMP CX, 0
         JE  END_MOV_LEFT
         PUSH SI                 ;save SI as a current CURR_POS
@@ -1348,10 +1347,10 @@ DO_MOV_RIGHT_LOOP:
         ADD SI, 2
         JMP DO_MOV_RIGHT_LOOP
 
-ABORT_CHECK_RIGHT:
+    ABORT_CHECK_RIGHT:
         ;TODO
 
-END_MOV_RIGHT:
+    END_MOV_RIGHT:
         POP SI
         POP DX
         POP CX
@@ -1372,7 +1371,7 @@ PUSH_CURR_POS   PROC    NEAR
         ;
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
-PUSH_CURR_POS_LOOP:
+    PUSH_CURR_POS_LOOP:
         CMP CX, 0
         JE  END_PUSH_CURR_POS
         PUSH SI                 ;save SI as a current CURR_POS
@@ -1395,7 +1394,7 @@ PUSH_CURR_POS_LOOP:
         POP SI
         ADD SI, 2
         JMP PUSH_CURR_POS_LOOP
-END_PUSH_CURR_POS:
+    END_PUSH_CURR_POS:
         ;
         POP SI
         POP DX
@@ -1417,7 +1416,7 @@ POP_CURR_POS   PROC    NEAR
         ;
         MOV SI, OFFSET CURR_POS ;first block position
         MOV CX, 4               ;CX is a house in block counter
-POP_CURR_POS_LOOP:
+    POP_CURR_POS_LOOP:
         CMP CX, 0
         JE  END_POP_CURR_POS
         PUSH SI                 ;save SI as a current CURR_POS
@@ -1439,7 +1438,7 @@ POP_CURR_POS_LOOP:
         POP SI
         ADD SI, 2
         JMP POP_CURR_POS_LOOP
-END_POP_CURR_POS:
+    END_POP_CURR_POS:
         ;
         POP SI
         POP DX
