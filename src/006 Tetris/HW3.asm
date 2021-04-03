@@ -1841,6 +1841,150 @@ ROTATE      PROC    NEAR
 
 ROTATE      ENDP
 ;----------------------------------------------------------
+; Init new block and set current position, location
+;   and block type.
+;  Call this procedure when MOV_DOWN aborted.
+;
+;   (Comments are based on 12 coloumn)
+;
+INIT_BLOCK  PROC    NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ; Random Type
+        XOR AX, AX
+        RAND 1, 5, AX
+        MOV AH, AL
+        MOV AL, 01
+        MOV CURR_TYPE, AX
+        ; Random Colour
+        XOR AX, AX
+        RAND 1, 17, AX
+        MOV CURR_COLOR, AL
+        ; First position
+        MOV AX, CURR_TYPE
+        CMP AH, 1
+            JE  INIT_POS_TYPE_1
+        CMP AH, 2
+            JE  INIT_POS_TYPE_2
+        CMP AH, 3
+            JE  INIT_POS_TYPE_3
+        CMP AH, 4
+            JE  INIT_POS_TYPE_4
+        CMP AH, 5
+            JE  INIT_POS_TYPE_5
+    INIT_POS_TYPE_1:
+        MOV SI, OFFSET CURR_POS
+        MOV [SI],   COLOUMNS/2-2    ;0004h
+        MOV [SI+1], 0  
+        MOV [SI+2], COLOUMNS/2-1    ;0005h
+        MOV [SI+3], 0
+        MOV [SI+4], COLOUMNS/2      ;0006h
+        MOV [SI+5], 0
+        MOV [SI+6], COLOUMNS/2+1    ;0007h
+        MOV [SI+7], 0
+        ;
+        XOR BX, BX
+        MOV BH, CURR_COLOR
+        MOV BL, 1
+        MOV SI, OFFSET BLOCKS
+        MOV [SI+COLOUMNS-4], BX     ;(COLOUMNS/2-2)*2 + 0
+        MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0
+        MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2   + 0
+        MOV [SI+COLOUMNS+2], BX     ;(COLOUMNS/2+1)*2 + 0
+        JMP END_INIT
+    INIT_POS_TYPE_2:
+        MOV SI, OFFSET CURR_POS
+        MOV [SI],   COLOUMNS/2-1    ;0005h
+        MOV [SI+1], 0  
+        MOV [SI+2], COLOUMNS/2      ;0006h
+        MOV [SI+3], 0
+        MOV [SI+4], COLOUMNS/2-1    ;0105h
+        MOV [SI+5], 1
+        MOV [SI+6], COLOUMNS/2      ;0106h
+        MOV [SI+7], 1
+        ;
+        XOR BX, BX
+        MOV BH, CURR_COLOR
+        MOV BL, 1
+        MOV SI, OFFSET BLOCKS
+        MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
+        MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2 + 0 * row
+        MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2   + 1 * row
+        MOV [SI+3*COLOUMNS], BX     ;(COLOUMNS/2)*2 + 1 * row
+        JMP END_INIT
+    INIT_POS_TYPE_3:
+        MOV SI, OFFSET CURR_POS
+        MOV [SI],   COLOUMNS/2-1    ;0005h
+        MOV [SI+1], 0  
+        MOV [SI+2], COLOUMNS/2-1    ;0105h
+        MOV [SI+3], 1
+        MOV [SI+4], COLOUMNS/2-1    ;0205h
+        MOV [SI+5], 2
+        MOV [SI+6], COLOUMNS/2      ;0206h
+        MOV [SI+7], 2
+        ;
+        XOR BX, BX
+        MOV BH, CURR_COLOR
+        MOV BL, 1
+        MOV SI, OFFSET BLOCKS
+        MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
+        MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 1 * row
+        MOV [SI+5*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 2 * row
+        MOV [SI+5*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 2 * row
+        JMP END_INIT
+    INIT_POS_TYPE_4:
+        MOV SI, OFFSET CURR_POS
+        MOV [SI],   COLOUMNS/2-1    ;0005h
+        MOV [SI+1], 0  
+        MOV [SI+2], COLOUMNS/2-1    ;0105h
+        MOV [SI+3], 1
+        MOV [SI+4], COLOUMNS/2      ;0106h
+        MOV [SI+5], 1
+        MOV [SI+6], COLOUMNS/2      ;0206h
+        MOV [SI+7], 2
+        ;
+        XOR BX, BX
+        MOV BH, CURR_COLOR
+        MOV BL, 1
+        MOV SI, OFFSET BLOCKS
+        MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
+        MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 1 * row
+        MOV [SI+3*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 1 * row
+        MOV [SI+5*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 2 * row
+        JMP END_INIT
+    INIT_POS_TYPE_5:
+        MOV SI, OFFSET CURR_POS
+        MOV [SI],   COLOUMNS/2-1    ;0005h
+        MOV [SI+1], 0  
+        MOV [SI+2], COLOUMNS/2      ;0006h
+        MOV [SI+3], 0
+        MOV [SI+4], COLOUMNS/2+1    ;0007h
+        MOV [SI+5], 0
+        MOV [SI+6], COLOUMNS/2      ;0106h
+        MOV [SI+7], 1
+        ;
+        XOR BX, BX
+        MOV BH, CURR_COLOR
+        MOV BL, 1
+        MOV SI, OFFSET BLOCKS
+        MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
+        MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2   + 0 * row
+        MOV [SI+COLOUMNS+2], BX     ;(COLOUMNS/2+1)*2 + 0 * row
+        MOV [SI+3*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 1 * row
+        JMP END_INIT
+    END_INIT:
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+INIT_BLOCK  ENDP
+;----------------------------------------------------------
 ;Vanish current block from map
 ;   Read-also: POP_CURR_POS
 PUSH_CURR_POS   PROC    NEAR
