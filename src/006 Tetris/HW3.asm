@@ -1315,25 +1315,248 @@ MOV_RIGHT   PROC    NEAR
         JMP DO_MOV_RIGHT
 
     CHECK_MOV_RIGHT_TYPE_3_1:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-2      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2       ;access block right to the second block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2+2     ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_3_2:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2-4       ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_3_3:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        SUB SI, COLOUMNS2       ;access block right to the second block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        SUB SI, COLOUMNS2       ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_3_4:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-3      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 6               ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        SUB SI, COLOUMNS2       ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_4_1:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-2      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2+2     ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2       ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_4_2:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2-2     ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_5_1:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-3      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 6               ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2-2     ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_5_2:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2       ;access block right to the second block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2       ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, COLOUMNS2       ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_5_3:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, -COLOUMNS2-2       ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
+
     CHECK_MOV_RIGHT_TYPE_5_4:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, COLOUMNS-2      ;abort if is in the last coloumn 
+        JGE ABORT_CHECK_RIGHT
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        ADD SI, 2               ;access block right to the first block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, -COLOUMNS2+2    ;access block right to the fourth block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        ADD SI, -COLOUMNS2-2    ;access block right to the third block position
+        MOV AX, [SI]
+        CMP AL, 1
+        JE  ABORT_CHECK_RIGHT
+        JMP DO_MOV_RIGHT
 
     ; move down all of the current positions
     ; for house in CURR_POS:
@@ -1350,7 +1573,7 @@ MOV_RIGHT   PROC    NEAR
         MOV CX, 4               ;CX is a house in block counter
     DO_MOV_RIGHT_LOOP:
         CMP CX, 0
-        JE  END_MOV_LEFT
+        JE  END_MOV_RIGHT
         PUSH SI                 ;save SI as a current CURR_POS
         MOV BX, [SI]            ;BH -> i and BL -> j
         PUSH BX                 ;update CURR_POS values
