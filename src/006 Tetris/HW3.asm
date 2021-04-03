@@ -41,6 +41,33 @@ BLOCKS  DW      ?, ?, ?, ?, 0901h, 0901h, 0901h, 0901h, ?, ?, ?, ?
         DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
         DW      ?, ?, ?, 0F01h, ?, ?, ?, ?, ?, ?, ?, ?
 ;----------------------------------------------------------
+; Return random value between min to max.
+;   and save output to RANDOM_NUM.
+;   
+; ARGUMENTS:
+;   MIN: lower bound
+;   MAX: upper bound
+;   RVAL: return register (16bits)
+RAND  MACRO   MIN, MAX, RVAL
+        PUSH AX
+        PUSH CX
+        PUSH DX
+        MOV AH,0h           ; interrupts to get system time
+        INT 1Ah             ; CX:DX now hold number of clock ticks since midnight
+        MOV AX, DX
+        xor DX, DX
+        XOR CX, CX          ; CX = MAX-MIN
+        MOV CX, MAX
+        SUB CX, MIN
+        DIV CX              ; here dx contains the remainder of the division - from 0 to MAX
+        ADD DX, MIN
+        MOV RANDOM_NUM, DX
+        POP DX
+        POP CX
+        POP AX
+        MOV RVAL, RANDOM_NUM
+ENDM
+;----------------------------------------------------------
         .CODE
 MAIN    PROC    FAR
         MOV     AX, @DATA   ;load the data segment address
