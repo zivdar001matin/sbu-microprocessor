@@ -966,7 +966,7 @@ MOV_LEFT    PROC     NEAR
 
     CHECK_MOV_LEFT_TYPE_3_3:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI]            ;BH -> i and BL -> j
+        MOV BX, [SI+6]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
         JE  ABORT_CHECK_LEFT
         XOR AX, AX              ;clear AX
@@ -976,16 +976,15 @@ MOV_LEFT    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        SUB SI, 2               ;access block left to the first block position
+        SUB SI, 2               ;access block left to the fourth block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        SUB SI, COLOUMNS2       ;access block left to the second block position
+        ADD SI, COLOUMNS2+2     ;access block left to the second block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        SUB SI, 2               ;access block left to the
-        SUB SI, COLOUMNS2       ; fourth block position
+        ADD SI, 2+COLOUMNS2     ;access block left to the
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
@@ -1043,7 +1042,7 @@ MOV_LEFT    PROC     NEAR
 
     CHECK_MOV_LEFT_TYPE_4_2:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+2]          ;BH -> i and BL -> j
+        MOV BX, [SI+6]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
         JE  ABORT_CHECK_LEFT
         XOR AX, AX              ;clear AX
@@ -1053,12 +1052,12 @@ MOV_LEFT    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        SUB SI, 2               ;access block left to the second block position
+        SUB SI, 2               ;access block left to the fourth block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left to
-        SUB SI, 2               ; the fourth block position
+        SUB SI, COLOUMNS2       ;access block left to
+        ADD SI, 2               ; the second block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
@@ -1089,7 +1088,7 @@ MOV_LEFT    PROC     NEAR
 
     CHECK_MOV_LEFT_TYPE_5_2:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+4]          ;BH -> i and BL -> j
+        MOV BX, [SI+6]          ;BH -> i and BL -> j
         CMP BL, 0               ;abort if is in the first coloumn
         JE  ABORT_CHECK_LEFT
         XOR AX, AX              ;clear AX
@@ -1099,17 +1098,15 @@ MOV_LEFT    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        SUB SI, 2               ;access block left to the first block position
+        SUB SI, 2               ;access block left to the fourth block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left to
-        SUB SI, 2               ; the fourth block position
+        ADD SI, -COLOUMNS2+2    ;access block left to the first block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left
-        ADD SI, 2               ; to the third block position
+        ADD SI, 2*COLOUMNS2     ;access block left to the third block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
@@ -1117,7 +1114,7 @@ MOV_LEFT    PROC     NEAR
 
     CHECK_MOV_LEFT_TYPE_5_3:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI]            ;BH -> i and BL -> j
+        MOV BX, [SI+4]          ;BH -> i and BL -> j (third block position)
         CMP BL, 0               ;abort if is in the first coloumn
         JE  ABORT_CHECK_LEFT
         XOR AX, AX              ;clear AX
@@ -1127,11 +1124,11 @@ MOV_LEFT    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        SUB SI, 2               ;access block left to the first block position
+        SUB SI, 2               ;access block left to the third block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left
+        SUB SI, COLOUMNS2       ;access block left
         ADD SI, 2               ; to the fourth block position
         MOV AX, [SI]
         CMP AL, 1
@@ -1154,11 +1151,11 @@ MOV_LEFT    PROC     NEAR
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left to the second block position
+        SUB SI, COLOUMNS2       ;access block left to the second block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, COLOUMNS2       ;access block left to the third block position
+        SUB SI, COLOUMNS2       ;access block left to the third block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
