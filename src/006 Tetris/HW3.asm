@@ -541,7 +541,7 @@ MOV_DOWN    PROC     NEAR
 
     CHECK_MOV_DOWN_TYPE_3_2:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+2]          ;BH -> i and BL -> j
+        MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
         JE  ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
@@ -616,7 +616,7 @@ MOV_DOWN    PROC     NEAR
 
     CHECK_MOV_DOWN_TYPE_4_1:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+2]          ;BH -> i and BL -> j
+        MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
         JE  ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
@@ -626,7 +626,7 @@ MOV_DOWN    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        ADD SI, 2               ;access block under the second block position
+        ADD SI, 2*COLOUMNS2     ;access block under the second block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_DOWN
@@ -742,7 +742,7 @@ MOV_DOWN    PROC     NEAR
 
     CHECK_MOV_DOWN_TYPE_5_4:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+4]            ;BH -> i and BL -> j
+        MOV BX, [SI]            ;BH -> i and BL -> j
         CMP BH, ROWS-1          ;anort if is in the last row 
         JE  ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
@@ -752,7 +752,7 @@ MOV_DOWN    PROC     NEAR
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access first block position
-        ADD SI, COLOUMNS2       ;access block under the third block position
+        ADD SI, COLOUMNS2       ;access block under the first block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_DOWN
