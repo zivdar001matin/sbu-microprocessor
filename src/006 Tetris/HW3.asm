@@ -542,8 +542,8 @@ MOV_DOWN    PROC     NEAR
     CHECK_MOV_DOWN_TYPE_3_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BH, ROWS-1          ;anort if is in the last row 
-        JE  ABORT_CHECK_DOWN
+        CMP BH, ROWS-2          ;anort if is in the last row 
+        JGE ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -617,8 +617,8 @@ MOV_DOWN    PROC     NEAR
     CHECK_MOV_DOWN_TYPE_4_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BH, ROWS-1          ;anort if is in the last row 
-        JE  ABORT_CHECK_DOWN
+        CMP BH, ROWS-4          ;anort if is in the last row 
+        JGE  ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -640,8 +640,8 @@ MOV_DOWN    PROC     NEAR
     CHECK_MOV_DOWN_TYPE_4_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BH, ROWS-1          ;anort if is in the last row 
-        JE  ABORT_CHECK_DOWN
+        CMP BH, ROWS-2          ;anort if is in the last row 
+        JGE ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
