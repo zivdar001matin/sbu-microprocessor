@@ -1679,6 +1679,11 @@ ROTATE      PROC    NEAR
     CHECK_ROTATE_TYPE_1_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP AL, 2
+        JL  ABORT_CHECK_ROTATE
+        CMP AL, COLUMN-1
+        JL  ABORT_CHECK_ROTATE
+        CMP AL, 
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1703,13 +1708,13 @@ ROTATE      PROC    NEAR
 
     CHECK_ROTATE_TYPE_2_1:
         ;do nothing
-        JMP ABORT_CHECK_ROTATE
+        JMP END_ROTATE
 
     CHECK_ROTATE_TYPE_3_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BL, 0               ;anort if is in the first row 
-        JE  ABORT_CHECK_ROTATE
+        CMP BL, 1               ;abort if is in the first coloumn 
+        JL  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1736,6 +1741,8 @@ ROTATE      PROC    NEAR
     CHECK_ROTATE_TYPE_3_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BH, 1
+        JL  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1837,6 +1844,8 @@ ROTATE      PROC    NEAR
     CHECK_ROTATE_TYPE_4_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BH, 1
+        JL  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1859,6 +1868,8 @@ ROTATE      PROC    NEAR
     CHECK_ROTATE_TYPE_5_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BH, 1
+        JL  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1876,7 +1887,7 @@ ROTATE      PROC    NEAR
     CHECK_ROTATE_TYPE_5_2:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BH, COLOUMNS-1          ;anort if is in the last coloumn 
+        CMP BL, COLOUMNS-1      ;abort if is in the last coloumn 
         JE  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
@@ -1913,9 +1924,9 @@ ROTATE      PROC    NEAR
 
     CHECK_ROTATE_TYPE_5_4:
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+4]            ;BH -> i and BL -> j
-        CMP BH, ROWS-1          ;anort if is in the last row 
-        JE  ABORT_CHECK_ROTATE
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        CMP BL, 1               ;abort if is in the last row 
+        JL  ABORT_CHECK_ROTATE
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
