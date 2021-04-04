@@ -39,7 +39,7 @@ BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      0101h, 0201h, 0301h, 0401h, 0501h, 0601h, 0701h, 0801h, 0901h, 0A01h, 0B01h, 0C01h
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 RANDOM_NUM  DW      ?           ;use for RAND macro
 ;----------------------------------------------------------
 ; Return random value between min to max.
@@ -2488,6 +2488,16 @@ INIT_BLOCK  PROC    NEAR
         MOV BH, CURR_COLOR
         MOV BL, 1
         MOV SI, OFFSET BLOCKS
+        ; check end_game
+        CMP [SI+COLOUMNS-4], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS+2], 1
+        JE  STOP_GAME
+        ;
         MOV [SI+COLOUMNS-4], BX     ;(COLOUMNS/2-2)*2 + 0
         MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0
         MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2   + 0
@@ -2508,6 +2518,16 @@ INIT_BLOCK  PROC    NEAR
         MOV BH, CURR_COLOR
         MOV BL, 1
         MOV SI, OFFSET BLOCKS
+        ; check end_game
+        CMP [SI+COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS], 1
+        JE  STOP_GAME
+        ;
         MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
         MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2 + 0 * row
         MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2   + 1 * row
@@ -2528,6 +2548,16 @@ INIT_BLOCK  PROC    NEAR
         MOV BH, CURR_COLOR
         MOV BL, 1
         MOV SI, OFFSET BLOCKS
+        ; check end_game
+        CMP [SI+COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+5*COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+5*COLOUMNS], 1
+        JE  STOP_GAME
+        ;
         MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
         MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 1 * row
         MOV [SI+5*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 2 * row
@@ -2548,6 +2578,16 @@ INIT_BLOCK  PROC    NEAR
         MOV BH, CURR_COLOR
         MOV BL, 1
         MOV SI, OFFSET BLOCKS
+        ; check end_game
+        CMP [SI+COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS], 1
+        JE  STOP_GAME
+        CMP [SI+5*COLOUMNS], 1
+        JE  STOP_GAME
+        ;
         MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
         MOV [SI+3*COLOUMNS-2], BX   ;(COLOUMNS/2-1)*2 + 1 * row
         MOV [SI+3*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 1 * row
@@ -2568,11 +2608,24 @@ INIT_BLOCK  PROC    NEAR
         MOV BH, CURR_COLOR
         MOV BL, 1
         MOV SI, OFFSET BLOCKS
+        ; check end_game
+        CMP [SI+COLOUMNS-2], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS], 1
+        JE  STOP_GAME
+        CMP [SI+COLOUMNS+2], 1
+        JE  STOP_GAME
+        CMP [SI+3*COLOUMNS], 1
+        JE  STOP_GAME
+        ;
         MOV [SI+COLOUMNS-2], BX     ;(COLOUMNS/2-1)*2 + 0 * row
         MOV [SI+COLOUMNS], BX       ;(COLOUMNS/2)*2   + 0 * row
         MOV [SI+COLOUMNS+2], BX     ;(COLOUMNS/2+1)*2 + 0 * row
         MOV [SI+3*COLOUMNS], BX     ;(COLOUMNS/2)*2   + 1 * row
         JMP END_INIT
+
+    END_GAME:
+        JMP STOP_GAME
     END_INIT:
         ;
         POP SI
