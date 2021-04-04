@@ -8,7 +8,8 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
 ROWS        EQU     8
 COLOUMNS    EQU     12
 COLOUMNS2   EQU     24          ;2*COLOUMNS
-BLOCK_SIZE  EQU     25
+BLOCK_SIZE  EQU     15
+ROW_PRINT_OFFSET    EQU 40     ;(200-BLOCK_SIZE*ROWS)/2
 
 ; block type constants
 ;          (read README):
@@ -204,6 +205,7 @@ PRINT_MAP   PROC    NEAR
         MOV DX, BLOCK_SIZE
         MUL DX
         MOV DX, AX          ;row = j
+        ADD DX, ROW_PRINT_OFFSET
         MOV AL, BLOCK_SIZE  ;store 25 at AL
         MOV AH, BLOCK_SIZE  ;store 25 at AH
         PUSH AX             ;push to use as a counter
