@@ -1683,9 +1683,8 @@ ROTATE      PROC    NEAR
         MOV BX, [SI]            ;BH -> i and BL -> j
         CMP AL, 2
         JL  ABORT_CHECK_ROTATE
-        CMP AL, COLUMN-1
+        CMP AL, COLOUMNS-1
         JL  ABORT_CHECK_ROTATE
-        CMP AL, 
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -1943,9 +1942,8 @@ ROTATE      PROC    NEAR
         JE  ABORT_CHECK_ROTATE
         JMP DO_ROTATE_TYPE_5_4
 
-    ; move down all of the current positions
-    ; for house in CURR_POS:
-    ;   BLOCKS[house.y-1, house.x] = BLOCKS[house.y, house.x]
+    ; DO_ROTATES
+
     DO_ROTATE_TYPE_1_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
@@ -2040,27 +2038,394 @@ ROTATE      PROC    NEAR
         ;
         JMP END_ROTATE
     DO_ROTATE_TYPE_2_1:
-        ;TODO
+        JMP END_ROTATE
     DO_ROTATE_TYPE_3_1:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, COLOUMNS2+2
+        MOV [SI], AX
+        POP SI
+        ADD SI, 2*COLOUMNS2
+        PUSH SI                 ;save third element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -COLOUMNS2-2
+        MOV [SI], AX
+        POP SI
+        ADD SI, 2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], -1          ;Third element  j
+        ADD [SI+5], -1          ;Third element  i
+        ADD [SI+6], -2          ;Fourth element j
+        ADD [SI+7], 0           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_3_2
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_3_2:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, COLOUMNS2-2
+        MOV [SI], AX
+        POP SI
+        ADD SI, -4
+        PUSH SI                 ;save third element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -COLOUMNS2+2
+        MOV [SI], AX
+        POP SI
+        ADD SI, COLOUMNS2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   -1          ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], 1           ;Third element  j
+        ADD [SI+5], -1          ;Third element  i
+        ADD [SI+6], 0           ;Fourth element j
+        ADD [SI+7], -2          ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_3_3
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_3_3:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -COLOUMNS2-2
+        MOV [SI], AX
+        POP SI
+        ADD SI, -2*COLOUMNS2
+        PUSH SI                 ;save third element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, COLOUMNS2+2
+        MOV [SI], AX
+        POP SI
+        ADD SI, -2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], 1           ;Third element  j
+        ADD [SI+5], 1           ;Third element  i
+        ADD [SI+6], 2           ;Fourth element j
+        ADD [SI+7], 0           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_3_4
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_3_4:
-        ;TODO
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -COLOUMNS2+2
+        MOV [SI], AX
+        POP SI
+        ADD SI, 4
+        PUSH SI                 ;save third element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, COLOUMNS2-2
+        MOV [SI], AX
+        POP SI
+        ADD SI, -COLOUMNS2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], -1          ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], -1          ;Third element  j
+        ADD [SI+5], 1           ;Third element  i
+        ADD [SI+6], 0           ;Fourth element j
+        ADD [SI+7], -2          ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_3_1
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_4_1:
-        ;TODO
+        ;move first block to the rotated_third pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ADD SI, 2*COLOUMNS2+2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], -1          ;Third element  j
+        ADD [SI+5], 1           ;Third element  i
+        ADD [SI+6], -2          ;Fourth element j
+        ADD [SI+7], 0           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_4_2
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_4_2:
-        ;TODO
+        ;move third block to the rotated_first pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI]            ;BH -> i and BL -> j
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access first block position
+        XOR BX, BX              ;clear BX
+        ADD SI, COLOUMNS2-2
+        PUSH SI                 ;save first element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ADD SI, -2
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   -1          ;First element  j
+        ADD [SI+1], -1          ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], 1           ;Third element  j
+        ADD [SI+5], -1          ;Third element  i
+        ADD [SI+6], 2           ;Fourth element j
+        ADD [SI+7], 0           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_4_1
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_5_1:
-        ;TODO
+        ;move fourth block to the rotated_first pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access fourth block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], -1          ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], -1          ;Third element  j
+        ADD [SI+5], 1           ;Third element  i
+        ADD [SI+6], -1          ;Fourth element j
+        ADD [SI+7], -1          ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_5_2
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_5_2:
-        ;TODO
+        ;move fourth block to the rotated_first pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access fourth block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   1           ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], -1          ;Third element  j
+        ADD [SI+5], -1          ;Third element  i
+        ADD [SI+6], 1           ;Fourth element j
+        ADD [SI+7], -1          ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_5_3
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_5_3:
-        ;TODO
+        ;move fourth block to the rotated_first pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access fourth block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, 2*COLOUMNS2
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   -1          ;First element  j
+        ADD [SI+1], 1           ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], 1           ;Third element  j
+        ADD [SI+5], -1          ;Third element  i
+        ADD [SI+6], 1           ;Fourth element j
+        ADD [SI+7], 1           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_5_4
+        ;
+        JMP END_ROTATE
     DO_ROTATE_TYPE_5_4:
-        ;TODO
+        ;move fourth block to the rotated_first pos
+        MOV SI, OFFSET CURR_POS ;first block position
+        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        XOR AX, AX              ;clear AX
+        MOV AL, COLOUMNS2       ;multiply i*24
+        MUL BH
+        ADD AL, BL              ;add j twice instead of multiplication
+        ADD AL, BL              ;2*j
+        MOV SI, OFFSET BLOCKS   ;access blocks array
+        ADD SI, AX              ;access fourth block position
+        XOR BX, BX              ;clear BX
+        PUSH SI                 ;save fourth element SI
+        MOV AX, [SI]
+        MOV [SI], BX            ;clear SI
+        ADD SI, -4
+        MOV [SI], AX
+        POP SI
+        ;
+        MOV SI, OFFSET CURR_POS
+        ADD [SI],   -1          ;First element  j
+        ADD [SI+1], -1          ;First element  i
+        ADD [SI+2], 0           ;Second element j
+        ADD [SI+3], 0           ;Second element i
+        ADD [SI+4], 1           ;Third element  j
+        ADD [SI+5], 1           ;Third element  i
+        ADD [SI+6], -1          ;Fourth element j
+        ADD [SI+7], 1           ;Fourth element i
+        ;
+        MOV CURR_TYPE, TYPE_5_1
+        ;
+        JMP END_ROTATE
 
     ABORT_CHECK_ROTATE:
         ;TODO
