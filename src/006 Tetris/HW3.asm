@@ -669,8 +669,8 @@ MOV_DOWN    PROC     NEAR
     CHECK_MOV_DOWN_TYPE_5_1:
         MOV SI, OFFSET CURR_POS ;first block position
         MOV BX, [SI]            ;BH -> i and BL -> j
-        CMP BH, ROWS-1          ;anort if is in the last row 
-        JE  ABORT_CHECK_DOWN
+        CMP BH, ROWS-2          ;anort if is in the last row
+        JGE ABORT_CHECK_DOWN
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -986,7 +986,7 @@ MOV_LEFT    PROC     NEAR
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
-        ADD SI, 2+COLOUMNS2     ;access block left to the
+        ADD SI, COLOUMNS2       ;access block left to the first block position
         MOV AX, [SI]
         CMP AL, 1
         JE  ABORT_CHECK_LEFT
