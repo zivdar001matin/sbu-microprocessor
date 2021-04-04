@@ -27,19 +27,20 @@ TYPE_5_3    EQU     0503h
 TYPE_5_4    EQU     0504h
 
 NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
-CURR_POS    DW      0004h, 0005h, 0006h, 0007h      ;show current blocks position
+CURR_POS    DW      ?, ?, ?, ?      ;show current blocks position
 CURR_POS_STACK  DW    ?, ?, ?, ?    ;use as memory to save current block colour and number
 CURR_DIR    DB      ?           ;show current block move direction
 CURR_COLOR  DB      ?           ;show current block color
-CURR_TYPE   DW      TYPE_1_1           ;show current block type
-BLOCKS  DW      ?, ?, ?, ?, 0901h, 0901h, 0901h, 0901h, ?, ?, ?, ?
+CURR_TYPE   DW      ?           ;show current block type
+BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h, 0C01h
-        DW      ?, 0D01h, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        DW      0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h, 0201h
-        DW      ?, ?, ?, 0F01h, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        DW      0101h, 0201h, 0301h, 0401h, 0501h, 0601h, 0701h, 0801h, 0901h, 0A01h, 0B01h, 0C01h
+RANDOM_NUM  DW      ?           ;use for RAND macro
 ;----------------------------------------------------------
 ; Return random value between min to max.
 ;   and save output to RANDOM_NUM.
@@ -82,6 +83,7 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
+        CALL INIT_BLOCK
         JMP GAME_LOOP
         ;CALL MOV_RIGHT
         ;CALL MOV_LEFT
@@ -798,7 +800,7 @@ MOV_DOWN    PROC     NEAR
         JMP DO_MOV_DOWN_LOOP
 
     ABORT_CHECK_DOWN:
-        ;TODO
+        CALL INIT_BLOCK
 
     END_MOV_DOWN:
         POP SI
