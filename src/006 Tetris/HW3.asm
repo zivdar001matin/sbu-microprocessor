@@ -42,6 +42,7 @@ BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 RANDOM_NUM  DW      ?           ;use for RAND macro
+MOV_DOWN_STATUS DB  ?           ;use for pressing 'f'
 ;----------------------------------------------------------
 ; Return random value between min to max.
 ;   and save output to RANDOM_NUM.
@@ -97,6 +98,7 @@ MAIN    PROC    FAR
         ;
 
     GAME_LOOP:
+        MOV MOV_DOWN_STATUS, 0
         ; check for player commands:
         MOV     AH, 01h
         INT     16h
@@ -144,6 +146,8 @@ MOV_BLOCK   PROC    NEAR
         JE  MOV_BLOCK_DOWN
         CMP AL, 100             ;compare current input with 'd'
         JE  MOV_BLOCK_RIGHT
+        CMP AL, 102             ;compare current input with 'f'
+        JE  MOV_BLOCK_DOWN_F
         JMP MOV_BLOCK_END
     ROTATE_BLOCK:
         CALL ROTATE
@@ -156,6 +160,9 @@ MOV_BLOCK   PROC    NEAR
         JMP MOV_BLOCK_END
     MOV_BLOCK_RIGHT:
         CALL MOV_RIGHT
+        JMP MOV_BLOCK_END
+    MOV_BLOCK_DOWN_F:
+        CALL MOV_DOWN_F
         JMP MOV_BLOCK_END
     MOV_BLOCK_END:
         POP AX
@@ -508,6 +515,26 @@ CLEAR_EMPTY_ROWS  PROC     NEAR
         RET
 
 CLEAR_EMPTY_ROWS  ENDP
+;----------------------------------------------------------
+MOV_DOWN_F  PROC  NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ;
+    MOV_DOWN_AGAIN:
+        CALL MOV_DOWN
+        CMP MOV_DOWN_STATUS, 1
+        JNZ MOV_DOWN_AGAIN
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+MOV_DOWN_F  ENDP
 ;----------------------------------------------------------
 ; to check if BLOCKS[i, j] is 1:
 ;   [SI] + 24*i + 2*j
