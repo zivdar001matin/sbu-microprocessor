@@ -92,6 +92,8 @@ MAIN    PROC    FAR
         ;CALL CHECK_ROWS
         ;CALL CLEAR_EMPTY_ROWS
         ;CALL PRINT_MAP
+        ;CALL PRINT_BORDERS
+        ;JMP STOP_GAME
         ;
 
     GAME_LOOP:
@@ -120,6 +122,7 @@ MAIN    PROC    FAR
         CALL CHECK_ROWS
         CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
+        CALL PRINT_BORDERS
         ;
         JMP GAME_LOOP
     STOP_GAME:
@@ -235,6 +238,99 @@ PRINT_MAP   PROC    NEAR
         JMP NEXT_COLOUMN
 
 PRINT_MAP   ENDP
+;----------------------------------------------------------
+; Print Border lines
+;
+; ARGUMENTS:
+;   NONE
+;
+; ↓↓ implement below logic ↓↓
+;   for i in 8+1:
+;       for j in 12:
+;           draw_vertical_line(BLOCKS_SIZE)
+;	for j in 12+1:
+;       for i in 8:
+;           draw_horizontal_line(BLOCKS_SIZE)
+PRINT_BORDERS   PROC    NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        ;
+        XOR AX, AX          ;clear AX
+        MOV DX, ROW_PRINT_OFFSET
+        XOR CX, CX          ;clear CX
+    PRINT_FOR1:
+        CMP AX, ROWS
+        JG  PRINT_BREAK1
+        XOR BX, BX          ;clear BX
+        MOV CX, 0
+    PRINT_FOR2:
+        CMP BX, COLOUMNS
+        JGE  PRINT_BREAK2
+        ;
+        PUSH AX             ;save out loop counter
+        MOV AH, 0Ch         ;AH=OCH FUNCTION TO SET A PIXEL
+        MOV AL, 7           ;light gray
+        PUSH BX             ;use as a inner inner loop
+        MOV BX, 0
+    LINE_LOOP1:
+        INT 10H
+        INC CX              ;next coloumn
+        INC BX              ;increase counter
+        CMP BX, BLOCK_SIZE
+        JNZ LINE_LOOP1
+        POP BX
+        POP AX
+        ;
+        INC BX
+        JMP PRINT_FOR2
+    PRINT_BREAK2:
+        ADD DX, BLOCK_SIZE
+        INC AX
+        JMP PRINT_FOR1
+    PRINT_BREAK1:
+        ;now print horizontal lines
+        XOR AX, AX          ;clear AX
+        XOR CX, CX          ;clear CX
+        XOR DX, DX          ;clear DX
+    PRINT_FOR3:
+        CMP AX, COLOUMNS
+        JG  PRINT_BREAK3
+        XOR BX, BX          ;clear BX
+        MOV DX, ROW_PRINT_OFFSET
+    PRINT_FOR4:
+        CMP BX, ROWS
+        JGE  PRINT_BREAK4
+        ;
+        PUSH AX             ;save out loop counter
+        MOV AH, 0Ch         ;AH=OCH FUNCTION TO SET A PIXEL
+        MOV AL, 7           ;light gray
+        PUSH BX             ;use as a inner inner loop
+        MOV BX, 0
+    LINE_LOOP2:
+        INT 10H
+        INC DX              ;next row
+        INC BX              ;increase counter
+        CMP BX, BLOCK_SIZE
+        JNZ LINE_LOOP2
+        POP BX
+        POP AX
+        ;
+        INC BX
+        JMP PRINT_FOR4
+    PRINT_BREAK4:
+        ADD CX, BLOCK_SIZE
+        INC AX
+        JMP PRINT_FOR3
+    PRINT_BREAK3:
+        ;
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+PRINT_BORDERS   ENDP
 ;----------------------------------------------------------
 ;Check if any row in the map is full of blocks, then clear it.
 ;
