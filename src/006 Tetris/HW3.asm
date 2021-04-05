@@ -2461,7 +2461,7 @@ INIT_BLOCK  PROC    NEAR
         MOV CURR_TYPE, AX
         ; Random Colour
         XOR AX, AX
-        RAND 1, 17, AX
+        RAND 9, 16, AX
         MOV CURR_COLOR, AL
         ; First position
         MOV AX, CURR_TYPE
