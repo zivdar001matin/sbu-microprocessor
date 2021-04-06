@@ -43,6 +43,9 @@ BLOCKS  DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         DW      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 RANDOM_NUM  DW      ?           ;use for RAND macro
 MOV_DOWN_STATUS DB  ?           ;use for pressing 'f'
+SCORE       DW      ?           ;use for scoring system
+NUMBER_MSG  DB      "0"
+NUMBER_PRINTED  DB  0
 ;----------------------------------------------------------
 ; Return random value between min to max.
 ;   and save output to RANDOM_NUM.
@@ -86,6 +89,8 @@ MAIN    PROC    FAR
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
         CALL INIT_BLOCK
+        CALL PRINT_MAP
+        CALL PRINT_BORDERS
         JMP GAME_LOOP
         ;CALL MOV_RIGHT
         ;CALL MOV_LEFT
@@ -119,12 +124,10 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         ;
-    NO_KEY:
-        MOV AX, 2
-        CALL CHECK_ROWS
-        CALL CLEAR_EMPTY_ROWS
         CALL PRINT_MAP
         CALL PRINT_BORDERS
+        CALL SHOW_SCORE
+    NO_KEY:
         ;
         JMP GAME_LOOP
     STOP_GAME:
@@ -245,6 +248,75 @@ PRINT_MAP   PROC    NEAR
         JMP NEXT_COLOUMN
 
 PRINT_MAP   ENDP
+;----------------------------------------------------------
+;show score on text mode
+SHOW_SCORE  PROC    NEAR
+        PUSH ax 
+        PUSH bx
+        PUSH cx
+        PUSH dx
+        PUSH si
+        PUSH es
+        ;show on LED device (port 199)
+        MOV AX, SCORE
+        OUT 199, AX
+        ;
+        PUSH DS
+        POP ES
+        ;
+        MOV CX,0 
+        MOV DX,0
+        MOV NUMBER_PRINTED, 0
+    LABEL1: 
+        CMP AX,0 
+        JE PRINT1       
+        MOV BX,10         
+        DIV BX                    
+        PUSH DX                
+        INC CX                 
+        XOR DX,DX 
+        JMP LABEL1 
+    PRINT1:  
+        CMP CX,0 
+        JE  EXIT
+        POP DX 
+        ADD DX,48   
+        MOV [NUMBER_MSG], DL   
+
+        INC NUMBER_PRINTED
+
+        PUSH AX 
+        PUSH BX
+        PUSH CX
+        PUSH DX   
+        ; print message using bios int 10h/13h function
+        MOV AL, 0
+        MOV BX, 3Fh
+        MOV CX, 1
+        MOV DL, NUMBER_PRINTED
+        MOV DH, 0               ;location on the screen
+        ;
+        MOV BP, offset  NUMBER_MSG           
+        MOV AH, 13h
+        INT 10h
+        ;
+        POP DX
+        POP CX
+        POP BX
+        POP AX  
+        ;decrease the count 
+        DEC CX 
+        JMP PRINT1 
+EXIT: 
+        POP es
+        POP si
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+        ;
+SHOW_SCORE  ENDP
 ;----------------------------------------------------------
 ; Print Border lines
 ;
@@ -378,6 +450,9 @@ CHECK_ROWS  PROC    NEAR
         POP CX              ;pop CX to become row counter to pass
         MOV AX, CX          ;as AX for CLEAR_ROW
         CALL CLEAR_ROW
+        ; increase score
+        ADD SCORE, 10
+        ;
         PUSH CX
     AFTER_CLEAR:
         POP CX
@@ -925,6 +1000,9 @@ MOV_DOWN    PROC     NEAR
         JMP DO_MOV_DOWN_LOOP
 
     ABORT_CHECK_DOWN:
+        MOV MOV_DOWN_STATUS, 1  ;use for clicking 'f'
+        CALL CHECK_ROWS
+        CALL CLEAR_EMPTY_ROWS
         CALL INIT_BLOCK
 
     END_MOV_DOWN:
