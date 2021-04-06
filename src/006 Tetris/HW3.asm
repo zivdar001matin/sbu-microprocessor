@@ -251,12 +251,12 @@ PRINT_MAP   ENDP
 ;----------------------------------------------------------
 ;show score on text mode
 SHOW_SCORE  PROC    NEAR
-        PUSH ax 
-        PUSH bx
-        PUSH cx
-        PUSH dx
-        PUSH si
-        PUSH es
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        PUSH ES
         ;show on LED device (port 199)
         MOV AX, SCORE
         OUT 199, AX
@@ -307,9 +307,9 @@ SHOW_SCORE  PROC    NEAR
         ;decrease the count 
         DEC CX 
         JMP PRINT1 
-EXIT: 
-        POP es
-        POP si
+    EXIT: 
+        POP ES
+        POP SI
         POP DX
         POP CX
         POP BX
