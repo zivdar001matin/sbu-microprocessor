@@ -1001,9 +1001,9 @@ MOV_DOWN    PROC     NEAR
 
     ABORT_CHECK_DOWN:
         MOV MOV_DOWN_STATUS, 1  ;use for clicking 'f'
+        CALL INIT_BLOCK
         CALL CHECK_ROWS
         CALL CLEAR_EMPTY_ROWS
-        CALL INIT_BLOCK
 
     END_MOV_DOWN:
         POP SI
