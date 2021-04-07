@@ -28,6 +28,7 @@ TYPE_5_3    EQU     0503h
 TYPE_5_4    EQU     0504h
 
 NEXT_TYPE   DW      ?, ?, ?     ;show next blocks types
+NEXT_COLOR  DB      ?, ?, ?     ;show next block colors
 CURR_POS    DW      ?, ?, ?, ?      ;show current blocks position
 CURR_POS_STACK  DW    ?, ?, ?, ?    ;use as memory to save current block colour and number
 CURR_DIR    DB      ?           ;show current block move direction
@@ -88,6 +89,7 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
+        CALL FIRST_INIT
         CALL INIT_BLOCK
         CALL PRINT_MAP
         CALL PRINT_BORDERS
@@ -2654,16 +2656,30 @@ INIT_BLOCK  PROC    NEAR
         PUSH CX
         PUSH DX
         PUSH SI
-        ; Random Type
+        ; Random Type - shift NEXT_TYPEs
         XOR AX, AX
         RAND 1, 5, AX
         MOV AH, AL
         MOV AL, 01
-        MOV CURR_TYPE, AX
-        ; Random Colour
+        MOV SI, OFFSET NEXT_TYPE
+        MOV BX, [SI]
+        MOV CURR_TYPE, BX               ;MOV CURR_TYPE, [SI]
+        MOV BX, [SI+2]
+        MOV [SI], BX
+        MOV BX, [SI+4]
+        MOV [SI+2], BX
+        MOV [SI+4], AX
+        ; Random Colour - shift NEXT_COLORs
         XOR AX, AX
         RAND 9, 16, AX
-        MOV CURR_COLOR, AL
+        MOV SI, OFFSET NEXT_COLOR
+        MOV BL, [SI]                    ;MOV CURR_COLOR, [SI]
+        MOV CURR_COLOR, BL
+        MOV BL, [SI+1]
+        MOV [SI], BL
+        MOV BL, [SI+2]
+        MOV [SI+1], BL
+        MOV [SI+2], AL
         ; First position
         MOV AX, CURR_TYPE
         CMP AH, 1
@@ -2838,6 +2854,45 @@ INIT_BLOCK  PROC    NEAR
         POP AX
         RET
 INIT_BLOCK  ENDP
+;----------------------------------------------------------
+FIRST_INIT  PROC    NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ; Random Type - shift NEXT_TYPEs
+        XOR AX, AX
+        RAND 1, 5, AX
+        MOV AH, AL
+        MOV AL, 01
+        MOV SI, OFFSET NEXT_TYPE
+        MOV [SI], AX
+        RAND 1, 5, AX
+        MOV AH, AL
+        MOV AL, 01
+        MOV [SI+2], AX
+        RAND 1, 5, AX
+        MOV AH, AL
+        MOV AL, 01
+        MOV [SI+4], AX
+        ; Random Colour - shift NEXT_COLORs
+        XOR AX, AX
+        RAND 9, 16, AX
+        MOV SI, OFFSET NEXT_COLOR
+        MOV [SI], AL
+        RAND 9, 16, AX
+        MOV [SI+1], AL
+        RAND 9, 16, AX
+        MOV [SI+2], AL
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+FIRST_INIT  ENDP
 ;----------------------------------------------------------
 ;Vanish current block from map
 ;   Read-also: POP_CURR_POS
