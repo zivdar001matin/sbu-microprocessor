@@ -91,6 +91,7 @@ MAIN    PROC    FAR
         MOV AX, 2
         CALL FIRST_INIT
         CALL INIT_BLOCK
+        CALL PRINT_NEXT_BLOCKS
         CALL PRINT_MAP
         CALL PRINT_BORDERS
         JMP GAME_LOOP
@@ -128,6 +129,7 @@ MAIN    PROC    FAR
         ;
         CALL PRINT_MAP
         CALL PRINT_BORDERS
+        CALL PRINT_NEXT_BLOCKS
         CALL SHOW_SCORE
     NO_KEY:
         ;
@@ -173,6 +175,281 @@ MOV_BLOCK   PROC    NEAR
         POP AX
         RET
 MOV_BLOCK   ENDP
+;----------------------------------------------------------
+; Print next blocks.
+; ALGORITHM:
+;   print first one at (1, coloumns + 1)
+;    and the second at (5, coloumns + 1)
+;
+PRINT_NEXT_BLOCKS   PROC    NEAR
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+        PUSH SI
+        ; print next first block
+        MOV SI, OFFSET NEXT_COLOR
+        MOV AL, [SI]
+        MOV CURR_COLOR, AL
+        MOV SI, OFFSET NEXT_TYPE
+        MOV AX, [SI]
+        CMP AX, TYPE_1_1
+        JE  NEXT_BLOCK_TYPE_1_1
+        CMP AX, TYPE_2_1
+        JE  NEXT_BLOCK_TYPE_2_1
+        CMP AX, TYPE_3_1
+        JE  NEXT_BLOCK_TYPE_3_1
+        CMP AX, TYPE_4_1
+        JE  NEXT_BLOCK_TYPE_4_1
+        CMP AX, TYPE_5_1
+        JE  NEXT_BLOCK_TYPE_5_1
+
+    NEXT_BLOCK_TYPE_1_1:
+        MOV BX, 1
+        MOV AX, COLOUMNS+1
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+4
+        CALL PRINT_BLOCK_PROC
+        JMP END_NEXT_BLOCK_TYPE
+    NEXT_BLOCK_TYPE_2_1:
+        MOV BX, 1
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_NEXT_BLOCK_TYPE
+    NEXT_BLOCK_TYPE_3_1:
+        MOV BX, 1
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 3
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 3
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_NEXT_BLOCK_TYPE
+    NEXT_BLOCK_TYPE_4_1:
+        MOV BX, 1
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 3
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_NEXT_BLOCK_TYPE
+    NEXT_BLOCK_TYPE_5_1:
+        MOV BX, 1
+        MOV AX, COLOUMNS+1
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 1
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 2
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        JMP END_NEXT_BLOCK_TYPE
+    END_NEXT_BLOCK_TYPE:
+        ; print second next block
+        MOV SI, OFFSET NEXT_COLOR
+        MOV AL, [SI+1]
+        MOV CURR_COLOR, AL
+        MOV SI, OFFSET NEXT_TYPE
+        MOV AX, [SI+2]
+        CMP AX, TYPE_1_1
+        JE  TWO_NEXT_BLOCK_TYPE_1_1
+        CMP AX, TYPE_2_1
+        JE  TWO_NEXT_BLOCK_TYPE_2_1
+        CMP AX, TYPE_3_1
+        JE  TWO_NEXT_BLOCK_TYPE_3_1
+        CMP AX, TYPE_4_1
+        JE  TWO_NEXT_BLOCK_TYPE_4_1
+        CMP AX, TYPE_5_1
+        JE  TWO_NEXT_BLOCK_TYPE_5_1
+
+    TWO_NEXT_BLOCK_TYPE_1_1:
+        MOV BX, 5
+        MOV AX, COLOUMNS+1
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+4
+        CALL PRINT_BLOCK_PROC
+        JMP END_TWO_NEXT_BLOCK_TYPE
+    TWO_NEXT_BLOCK_TYPE_2_1:
+        MOV BX, 5
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_TWO_NEXT_BLOCK_TYPE
+    TWO_NEXT_BLOCK_TYPE_3_1:
+        MOV BX, 5
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 7
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 7
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_TWO_NEXT_BLOCK_TYPE
+    TWO_NEXT_BLOCK_TYPE_4_1:
+        MOV BX, 5
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 7
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        JMP END_TWO_NEXT_BLOCK_TYPE
+    TWO_NEXT_BLOCK_TYPE_5_1:
+        MOV BX, 5
+        MOV AX, COLOUMNS+1
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 5
+        MOV AX, COLOUMNS+3
+        CALL PRINT_BLOCK_PROC
+        MOV BX, 6
+        MOV AX, COLOUMNS+2
+        CALL PRINT_BLOCK_PROC
+        JMP END_TWO_NEXT_BLOCK_TYPE
+    END_TWO_NEXT_BLOCK_TYPE:
+        ;
+        POP SI
+        POP DX
+        POP CX
+        POP BX
+        POP AX
+        RET
+PRINT_NEXT_BLOCKS   ENDP
+;----------------------------------------------------------
+;print block(i, j) where AX->i and BX->j
+PRINT_BLOCK_PROC    PROC    NEAR
+        ;multiply i by 25
+        ;MOV AX, AX
+        MOV CX, BLOCK_SIZE
+        MUL CX
+        MOV CX, AX          ;start line coloumn = i
+        ;multiply j by 25
+        MOV AX, BX
+        MOV DX, BLOCK_SIZE
+        MUL DX
+        MOV DX, AX          ;row = j
+        ADD DX, ROW_PRINT_OFFSET
+        PUSH CX             ;save first pixel of block
+        PUSH DX
+        MOV AL, BLOCK_SIZE  ;store 25 at AL
+        MOV AH, BLOCK_SIZE  ;store 25 at AH
+        PUSH AX             ;push to use as a counter
+    NEXT_COLOUMN2:
+        MOV AH,0CH          ;AH=OCH FUNCTION TO SET A PIXEL
+        MOV AL,CURR_COLOR   ;PIXELS= COLOR
+        INT 10H             ;INVOKE INTERRUPT TO SET A PIXEL OF LINE
+        INC CX              ;INCREMENT HORIZONTAL POSITION
+        POP AX
+        DEC AL
+        PUSH AX
+        CMP AL, 0           ;draw line length of 25px
+        JNE NEXT_COLOUMN2
+        POP AX
+        DEC AH
+        PUSH AX
+        CMP AX, 0           ;draw line width of 25px
+        JNE NEXT_ROW2
+        POP AX
+        JMP PRINT_BORDER_LABEL
+    NEXT_ROW2:
+        POP AX              ;reset coloumn counter to 25
+        MOV AL, BLOCK_SIZE
+        PUSH AX
+        SUB CX, BLOCK_SIZE  ;reset line coloumn
+        ADD DX, 1           ;go to next row
+        JMP NEXT_COLOUMN2
+
+    PRINT_BORDER_LABEL:
+        POP DX
+        POP CX
+        MOV AH, 0Ch         ;AH=OCH FUNCTION TO SET A PIXEL
+        MOV AL, 7           ;light gray
+        XOR BX, BX          ;clear BX
+    BORDER_FOR1:
+        INT 10h
+        INC CX              ;next coloumn
+        INC BX
+        CMP BX, BLOCK_SIZE
+        JNZ BORDER_FOR1
+        XOR BX, BX          ;clear BX
+    BORDER_FOR2:
+        INT 10h
+        INC DX              ;next row
+        INC BX
+        CMP BX, BLOCK_SIZE
+        JNZ BORDER_FOR2
+        XOR BX, BX          ;clear BX
+    BORDER_FOR3:
+        INT 10h
+        DEC CX              ;previous coloumn
+        INC BX
+        CMP BX, BLOCK_SIZE
+        JNZ BORDER_FOR3
+        XOR BX, BX          ;clear BX
+    BORDER_FOR4:
+        INT 10h
+        DEC DX              ;previous row
+        INC BX
+        CMP BX, BLOCK_SIZE
+        JNZ BORDER_FOR4
+        RET
+PRINT_BLOCK_PROC    ENDP
 ;----------------------------------------------------------
 ; ARGUMENTS:
 ;   NONE
@@ -1004,6 +1281,7 @@ MOV_DOWN    PROC     NEAR
     ABORT_CHECK_DOWN:
         MOV MOV_DOWN_STATUS, 1  ;use for clicking 'f'
         CALL INIT_BLOCK
+        CALL PRINT_NEXT_BLOCKS
         CALL CHECK_ROWS
         CALL CLEAR_EMPTY_ROWS
 
