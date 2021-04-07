@@ -107,16 +107,6 @@ MAIN    PROC    FAR
 
     GAME_LOOP:
         MOV MOV_DOWN_STATUS, 0
-        ; check for player commands:
-        MOV     AH, 01h
-        INT     16h
-        JZ      NO_KEY
-        MOV AH, 00h
-        INT 16h
-        CMP AL, 1Bh         ; esc - key?
-        JE  STOP_GAME       ;
-        MOV CURR_DIR, AL
-        CALL MOV_BLOCK     ;todo
         ;
         MOV AX,0600H        ;SCROLL THE SCREEN
         MOV BH,07           ;NORMALATIRIBUTE
@@ -131,7 +121,31 @@ MAIN    PROC    FAR
         CALL PRINT_BORDERS
         CALL PRINT_NEXT_BLOCKS
         CALL SHOW_SCORE
+    PLAYER_COMMAND:
+        ; check for player commands:
+        MOV     AH, 01h
+        INT     16h
+        JZ      NO_KEY
+        MOV AH, 00h
+        INT 16h
+        CMP AL, 1Bh         ; esc - key?
+        JE  STOP_GAME       ;
+        MOV CURR_DIR, AL
+        CALL MOV_BLOCK     ;todo
+        JMP AFTER_NO_KEY
     NO_KEY:
+        ; === wait a few moments here:
+        ; get number of clock ticks
+        ; (about 18 per second)
+        ; since midnight into cx:dx
+        MOV     AH, 00h
+        INT     1Ah
+        CMP     DX, WAIT_TIME
+        JB      PLAYER_COMMAND
+        ADD     DX, 18
+        MOV     WAIT_TIME, DX
+        CALL    MOV_DOWN
+    AFTER_NO_KEY:
         ;
         JMP GAME_LOOP
     STOP_GAME:
