@@ -47,6 +47,7 @@ MOV_DOWN_STATUS DB  ?           ;use for pressing 'f'
 SCORE       DW      ?           ;use for scoring system
 NUMBER_MSG  DB      "0"
 NUMBER_PRINTED  DB  0
+WAIT_TIME   DW      0           ;use for clock ticks
 ;----------------------------------------------------------
 ; Return random value between min to max.
 ;   and save output to RANDOM_NUM.
