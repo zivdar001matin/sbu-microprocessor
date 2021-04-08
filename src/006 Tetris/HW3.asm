@@ -3161,19 +3161,63 @@ FIRST_INIT  PROC    NEAR
         MOV AL, 01
         MOV SI, OFFSET NEXT_TYPE
         MOV [SI], AX
+        ; === wait a few moments here:
+        ; get number of clock ticks
+        ; (about 18 per second)
+        ; since midnight into cx:dx
+    WAIT_LOOP1:
+        MOV AH, 00h
+        INT 1Ah
+        CMP DX, WAIT_TIME
+        JB  WAIT_LOOP1
+        ADD DX, 3
+        MOV WAIT_TIME, DX
         RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV [SI+2], AX
+        ; === wait a few moments here:
+        ; get number of clock ticks
+        ; (about 18 per second)
+        ; since midnight into cx:dx
+    WAIT_LOOP2:
+        MOV AH, 00h
+        INT 1Ah
+        CMP DX, WAIT_TIME
+        JB  WAIT_LOOP2
+        ADD DX, 3
+        MOV WAIT_TIME, DX
         RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV [SI+4], AX
         ; Random Colour - shift NEXT_COLORs
         XOR AX, AX
+        ; === wait a few moments here:
+        ; get number of clock ticks
+        ; (about 18 per second)
+        ; since midnight into cx:dx
+    WAIT_LOOP3:
+        MOV AH, 00h
+        INT 1Ah
+        CMP DX, WAIT_TIME
+        JB  WAIT_LOOP3
+        ADD DX, 3
+        MOV WAIT_TIME, DX
         RAND 9, 16, AX
         MOV SI, OFFSET NEXT_COLOR
         MOV [SI], AL
+        ; === wait a few moments here:
+        ; get number of clock ticks
+        ; (about 18 per second)
+        ; since midnight into cx:dx
+    WAIT_LOOP4:
+        MOV AH, 00h
+        INT 1Ah
+        CMP DX, WAIT_TIME
+        JB  WAIT_LOOP4
+        ADD DX, 3
+        MOV WAIT_TIME, DX
         RAND 9, 16, AX
         MOV [SI+1], AL
         RAND 9, 16, AX
