@@ -2895,7 +2895,7 @@ ROTATE      PROC    NEAR
     DO_ROTATE_TYPE_5_4:
         ;move third block to the rotated_first pos
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+6]          ;BH -> i and BL -> j    (third block position)
+        MOV BX, [SI+4]          ;BH -> i and BL -> j    (third block position)
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
