@@ -2797,9 +2797,9 @@ ROTATE      PROC    NEAR
         ;
         JMP END_ROTATE
     DO_ROTATE_TYPE_5_1:
-        ;move fourth block to the rotated_first pos
+        ;move third block to the rotated_first pos
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        MOV BX, [SI+4]          ;BH -> i and BL -> j    (third block position)
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
@@ -2808,10 +2808,10 @@ ROTATE      PROC    NEAR
         MOV SI, OFFSET BLOCKS   ;access blocks array
         ADD SI, AX              ;access fourth block position
         XOR BX, BX              ;clear BX
-        PUSH SI                 ;save fourth element SI
+        PUSH SI                 ;save third element SI
         MOV AX, [SI]
         MOV [SI], BX            ;clear SI
-        ADD SI, -2*COLOUMNS2
+        ADD SI, -2-COLOUMNS2
         MOV [SI], AX
         POP SI
         ;
@@ -2829,21 +2829,21 @@ ROTATE      PROC    NEAR
         ;
         JMP END_ROTATE
     DO_ROTATE_TYPE_5_2:
-        ;move fourth block to the rotated_first pos
+        ;move third block to the rotated_first pos
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        MOV BX, [SI+4]          ;BH -> i and BL -> j    (third block position)
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
         ADD AL, BL              ;add j twice instead of multiplication
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
-        ADD SI, AX              ;access fourth block position
+        ADD SI, AX              ;access third block position
         XOR BX, BX              ;clear BX
-        PUSH SI                 ;save fourth element SI
+        PUSH SI                 ;save third element SI
         MOV AX, [SI]
         MOV [SI], BX            ;clear SI
-        ADD SI, 4
+        ADD SI, 2-COLOUMNS2
         MOV [SI], AX
         POP SI
         ;
@@ -2861,21 +2861,21 @@ ROTATE      PROC    NEAR
         ;
         JMP END_ROTATE
     DO_ROTATE_TYPE_5_3:
-        ;move fourth block to the rotated_first pos
+        ;move third block to the rotated_first pos
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        MOV BX, [SI+4]          ;BH -> i and BL -> j    (third block position)
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
         ADD AL, BL              ;add j twice instead of multiplication
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
-        ADD SI, AX              ;access fourth block position
+        ADD SI, AX              ;access third block position
         XOR BX, BX              ;clear BX
-        PUSH SI                 ;save fourth element SI
+        PUSH SI                 ;save third element SI
         MOV AX, [SI]
         MOV [SI], BX            ;clear SI
-        ADD SI, 2*COLOUMNS2
+        ADD SI, 2+COLOUMNS2
         MOV [SI], AX
         POP SI
         ;
@@ -2893,21 +2893,21 @@ ROTATE      PROC    NEAR
         ;
         JMP END_ROTATE
     DO_ROTATE_TYPE_5_4:
-        ;move fourth block to the rotated_first pos
+        ;move third block to the rotated_first pos
         MOV SI, OFFSET CURR_POS ;first block position
-        MOV BX, [SI+6]          ;BH -> i and BL -> j    (fourth block position)
+        MOV BX, [SI+6]          ;BH -> i and BL -> j    (third block position)
         XOR AX, AX              ;clear AX
         MOV AL, COLOUMNS2       ;multiply i*24
         MUL BH
         ADD AL, BL              ;add j twice instead of multiplication
         ADD AL, BL              ;2*j
         MOV SI, OFFSET BLOCKS   ;access blocks array
-        ADD SI, AX              ;access fourth block position
+        ADD SI, AX              ;access third block position
         XOR BX, BX              ;clear BX
-        PUSH SI                 ;save fourth element SI
+        PUSH SI                 ;save third element SI
         MOV AX, [SI]
         MOV [SI], BX            ;clear SI
-        ADD SI, -4
+        ADD SI, -2+COLOUMNS2
         MOV [SI], AX
         POP SI
         ;
