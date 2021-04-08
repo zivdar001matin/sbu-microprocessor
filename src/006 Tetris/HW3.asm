@@ -2951,7 +2951,7 @@ INIT_BLOCK  PROC    NEAR
         PUSH SI
         ; Random Type - shift NEXT_TYPEs
         XOR AX, AX
-        RAND 1, 5, AX
+        RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV SI, OFFSET NEXT_TYPE
@@ -3156,16 +3156,16 @@ FIRST_INIT  PROC    NEAR
         PUSH SI
         ; Random Type - shift NEXT_TYPEs
         XOR AX, AX
-        RAND 1, 5, AX
+        RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV SI, OFFSET NEXT_TYPE
         MOV [SI], AX
-        RAND 1, 5, AX
+        RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV [SI+2], AX
-        RAND 1, 5, AX
+        RAND 1, 6, AX
         MOV AH, AL
         MOV AL, 01
         MOV [SI+4], AX
