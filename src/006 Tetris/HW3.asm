@@ -4,6 +4,12 @@ TITLE   PROG6   (EXE)   PURPOSE: Tetris game
         .MODEL 64
         .STACK 64
 ;----------------------------------------------------------
+; this technology allows to make external add-on devices
+; for emu8086, such as led displays, robots, thermometers, stepper-motors, etc...
+; c:\emu8086\devices\led_display.exe
+#start=led_display.exe#
+; connected on port 199
+;----------------------------------------------------------
         .DATA
 ROWS        EQU     8
 COLOUMNS    EQU     12
@@ -90,6 +96,7 @@ MAIN    PROC    FAR
         MOV AL,13H          ;MODE = 13H (CGA Med RESOLUTION)
         INT 10H             ;INVOKE INTERRUPT TO CHANGE MODE
         MOV AX, 2
+        CALL SHOW_SCORE
         CALL FIRST_INIT
         CALL INIT_BLOCK
         CALL PRINT_NEXT_BLOCKS
