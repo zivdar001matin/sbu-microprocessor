@@ -1,0 +1,14 @@
+# Proteus files
+*.pdsprj
+*.pdsbak
+*.workspace
+
+# Keil uVision files
+**/DebugConfig
+**/Listings
+**/Objects
+**/RTE
+*.scvd
+*.uvguix.*
+*.uvoptx
+*.uvprojx
