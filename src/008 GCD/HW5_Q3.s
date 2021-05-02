@@ -21,8 +21,7 @@ __main FUNCTION
 	LDR R2, [SP], #4		;Caller-Saved register
 	LDR R1, [SP], #4		;Caller-Saved register
 	
-INFINITE_LOOP
-	B   INFINITE_LOOP
+	B	END_F
 
 GCD
 	STR LR, [SP,#-4]!		;save LR on Stack (Callee-saved)
@@ -44,6 +43,8 @@ DONE
 	BL GCD
 	LDR LR, [SP], #4		;Callee-Saved register
 	MOV PC, LR
+
+END_F
 
  ENDFUNC	
  END
