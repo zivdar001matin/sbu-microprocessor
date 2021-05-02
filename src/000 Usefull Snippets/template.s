@@ -2,7 +2,7 @@
 	EXPORT SystemInit
     EXPORT __main
 
-	AREA RESET,CODE,READONLY 
+	AREA MYPROG,CODE,READONLY 
 
 SystemInit FUNCTION
 	; initialization code
@@ -13,8 +13,8 @@ SystemInit FUNCTION
 __main FUNCTION
 	;Implement your code here
 
-INFINITE_LOOP
-	B INFINITE_LOOP
+
+END_F
 
  ENDFUNC	
  END
