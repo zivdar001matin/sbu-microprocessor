@@ -1,0 +1,53 @@
+
+	EXPORT SystemInit
+    EXPORT __main
+
+	AREA MYPROG,CODE,READONLY 
+
+SystemInit FUNCTION
+	; initialization code
+ ENDFUNC
+
+
+; main logic of code
+__main FUNCTION
+
+	MOV	R0, #0x30000000		;n = F0000000
+	BL  REVERSE				;reversed(n) = 0000000F = 15
+	BL  FACTORIAL
+	MOV R10, R1
+
+	B	END_F
+	
+
+REVERSE
+	MOV R1, #0				;reversed result
+	MOV R3, #0				;counter = 0
+REVERSE_LOOP
+	MOV R4, R0, LSR #31
+	MOV R4, R4, LSL R3
+	MOV R0, R0, LSL #1
+	ADD R1, R4
+	ADD R3, #1
+	CMP R3, #32
+	BNE	REVERSE_LOOP
+	MOV PC, LR
+
+FACTORIAL
+	STR LR, [SP,#-4]!
+	CMP R1, #1
+	BLE	RET_FACTORIAL
+	STR R1, [SP, #-4]!
+	ADD R1, #-1
+	BL	FACTORIAL
+	MOV R2, R1
+	LDR R1, [SP], #4
+	UMULL	R1, R3, R1, R2
+RET_FACTORIAL
+	LDR LR, [SP], #4
+	MOV PC, LR
+
+END_F
+
+ ENDFUNC	
+ END
