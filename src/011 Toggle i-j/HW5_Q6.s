@@ -1,0 +1,50 @@
+
+	EXPORT SystemInit
+    EXPORT __main
+
+	AREA MYPROG,CODE,READONLY 
+
+SystemInit FUNCTION
+	; MOV R1, #0x12345678
+	MOV R1, #0x12000000
+	ORR R1, #0x340000
+	ORR R1, #0x5600
+	ORR R1, #0x78
+	MOV R2, #8	;i = 8
+	MOV R3, #12	;j = 12
+ ENDFUNC
+
+
+; main logic of code
+__main FUNCTION
+
+	MVN R0, R1	;R0 = (not)R1
+	MOV R4, #32	;loop counter
+	MOV R5, #0	;result
+	
+LOOP
+	MOV R5, R5, LSL #1
+	CMP R4, R2
+	BLE NO_TOGGLE
+	CMP R4, R3
+	BGT NO_TOGGLE
+	MOVS R0, R0, LSL #1
+	MOV R1, R1, LSL #1
+	B	OUT_IF
+NO_TOGGLE
+	MOV R0, R0, LSL #1
+	MOVS R1, R1, LSL #1
+	B	OUT_IF
+OUT_IF
+	ADC R5, #0
+	ADD R4, #-1
+	CMP R4, #0
+	BNE LOOP
+	
+	MOV R1, R5
+
+
+END_F
+
+ ENDFUNC	
+ END
