@@ -6,15 +6,14 @@
 	AREA MYPROG,CODE,READONLY 
 
 SystemInit FUNCTION
-	; initialization code
+	MOV R1,#12      ;a = 12
+	MOV R2,#8       ;b = 8
  ENDFUNC
 
 
 ; add numbers from 1 to 9 
 ; main logic of code
 __main FUNCTION
-	MOV R1,#12      ;a = 12
-	MOV R2,#8       ;b = 8
 	STR R1, [SP,#-4]!		;Caller-Saved register
 	STR R2, [SP,#-4]!		;Caller-Saved register
 	BL  GCD

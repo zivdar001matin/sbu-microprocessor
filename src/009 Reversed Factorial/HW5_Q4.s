@@ -6,14 +6,14 @@
 
 SystemInit FUNCTION
 	; initialization code
+	MOV	R0, #0x30000000		;n = 30000000
  ENDFUNC
 
 
 ; main logic of code
 __main FUNCTION
 
-	MOV	R0, #0x30000000		;n = F0000000
-	BL  REVERSE				;reversed(n) = 0000000F = 15
+	BL  REVERSE				;reversed(n) = 0000000B = 12
 	BL  FACTORIAL
 	MOV R10, R1
 

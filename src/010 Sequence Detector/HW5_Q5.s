@@ -6,16 +6,16 @@
 
 SystemInit FUNCTION
 	; initialization code
+	; R10 = 0x05CBCF9D = 97243037
+	MOV R10, #0x5000000
+	ORR R10, #0xCB0000
+	ORR R10, #0xCF00
+	ORR R10, #0x9D
  ENDFUNC
 
 
 ; main logic of code
 __main FUNCTION
-	; R10 = 0x05CBCF9D
-	MOV R10, #0x5000000
-	ORR R10, #0xCB0000
-	ORR R10, #0xCF00
-	ORR R10, #0x9D
 	
 	STR R10, [SP,#-4]!
 	
