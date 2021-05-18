@@ -27,7 +27,7 @@ SystemInit FUNCTION
 	;GPIOB MODER 
 	LDR R1 , =GPIOB_MODER
 	LDR R0 , [R1]
-	MOV R0 , 0x55000000 ;01 01 01 01 -> 00000 
+	LDR R0 , =0x55000055 ;01 01 01 01 -> 00000 
 	STR R0 , [R1]
 	
  ENDFUNC
@@ -37,6 +37,7 @@ SystemInit FUNCTION
 __main FUNCTION
 
 GET_FIRST
+	MOV R9, #0
 	BL GetKeyPress
 	CMP R0, 0xA
 	BGE GET_FIRST
@@ -46,8 +47,13 @@ GET_FIRST
 	LDR R1, =GPIOA_ODR
 	LSL R2, R0, #12
 	STR R2, [R1]
+	;show on LED
+	LDR R1, =GPIOB_ODR
+	MOV R0, #8
+	STR R0, [R1]
 
 GET_HASH
+	MOV R9, #8
 	BL GetKeyPress
 	CMP R0, 0xB
 	BNE GET_HASH
@@ -66,9 +72,12 @@ GetKeyPress FUNCTION
 ;Return key pressed in register R0.
 ;	used registers:
 ;		R0, R1, R2, R3
+; 	input registers:
+;		R9 -> ORR with GPIOB output
 	;FIRST ROW KP ENABLE
 	LDR R2 , =GPIOB_ODR
-	MOV R3 , 0xEFFF
+	MOV R3 , 0xEFF0
+	ORR R3 , R9
 	STR R3 , [R2]
 	
 	LDR R2 , =GPIOB_IDR
@@ -96,7 +105,8 @@ GetKeyPress FUNCTION
 	
 	;SECOND ROW KP ENABLE
 	LDR R2 , =GPIOB_ODR
-	MOV R3 , 0xDFFF
+	MOV R3 , 0xDFF0
+	ORR R3 , R9
 	STR R3 , [R2]
 
 	LDR R2 , =GPIOB_IDR
@@ -124,7 +134,8 @@ GetKeyPress FUNCTION
 	
 	;THIRD ROW KP ENABLE
 	LDR R2 , =GPIOB_ODR
-	MOV R3 , 0xBFFF
+	MOV R3 , 0xBFF0
+	ORR R3 , R9
 	STR R3 , [R2]
 
 	LDR R2 , =GPIOB_IDR
@@ -152,7 +163,8 @@ GetKeyPress FUNCTION
 	
 	;FOURTH ROW KP ENABLE
 	LDR R2 , =GPIOB_ODR
-	MOV R3 , 0x7FFF
+	MOV R3 , 0x7FF0
+	ORR R3 , R9
 	STR R3 , [R2]
 
 	LDR R2 , =GPIOB_IDR
