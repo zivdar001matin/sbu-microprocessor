@@ -64,9 +64,72 @@ GET_SECOND
 	BGE GET_SECOND
 	MOV R11, R0
 
+	MOV R0, R12
+	MOV R1, #3			;counter for number showing
+	MOV R2, #0			;showing number on LEDs
+	CMP R0, R11
+	ADD R11, #1
+	BEQ END_F
+	BLT GO_UP
+	BGE GO_DOWN
+	B	END_F
+
+GO_UP
+	MOV R3, R0			;temp register
+	MOV R4, R1
+	LSL R4, #2			;multiply R1*4
+	LSL R3, R4
+	ORR R2, R3
+	;show on 7segments
+	LDR R3, =GPIOA_ODR
+	STR R2, [R3]
+	;show on LED
+	LDR R3, =GPIOB_ODR
+	MOV R4, #1
+	MOV R5, R1
+POWER
+	CMP R5, #0
+	BEQ END_POWER
+	LSL R4, #1
+	SUB R5, #1
+	B	POWER
+END_POWER
+
+	STR R4, [R3]			;multiply 2^R1
+	ADD R0, #1
+	SUB R1, #1
+	;
+	CMP R0, R11
+	BEQ END_F
+	CMP R1, #-1
+	MOVEQ R1, #3
+	MOVEQ R2, #0
+	BL 	DELAY
+	B 	GO_UP
+
+GO_DOWN
+	;TODO
+	CMP R0, R11
+	BEQ END_F
+
+
 END_F
+INF_LOOP
+	B INF_LOOP
 
  ENDFUNC
+ 
+
+DELAY
+;Return key pressed in register R0.
+;	used registers:
+;		R8
+            LDR R8, = 0x4FFFFF
+D_LOOP      NOP
+            NOP
+            SUBS R8, #1
+            BNE D_LOOP
+            MOV PC, LR
  
 GetKeyPress FUNCTION
 ;Return key pressed in register R0.
