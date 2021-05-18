@@ -35,7 +35,28 @@ SystemInit FUNCTION
 
 ; main logic of code
 __main FUNCTION
-	;Implement your code here
+
+GET_FIRST
+	BL GetKeyPress
+	CMP R0, 0xA
+	BGE GET_FIRST
+	MOV R12, R0
+
+	;show on 7segments
+	LDR R1, =GPIOA_ODR
+	LSL R2, R0, #12
+	STR R2, [R1]
+
+GET_HASH
+	BL GetKeyPress
+	CMP R0, 0xB
+	BNE GET_HASH
+
+GET_SECOND
+	BL GetKeyPress
+	CMP R0, 0xA
+	BGE GET_SECOND
+	MOV R11, R0
 
 END_F
 
