@@ -71,6 +71,9 @@ GET_SECOND
 	ADD R11, #1
 	BEQ END_F
 	BLT GO_UP
+	SUB R0, #1
+	SUB R11, #2
+	MOV R1, #0
 	BGE GO_DOWN
 	B	END_F
 
@@ -108,9 +111,37 @@ END_POWER
 	B 	GO_UP
 
 GO_DOWN
-	;TODO
+	MOV R3, R0			;temp register
+	MOV R4, R1
+	LSL R4, #2			;multiply R1*4
+	LSL R3, R4
+	ORR R2, R3
+	;show on 7segments
+	LDR R3, =GPIOA_ODR
+	STR R2, [R3]
+	;show on LED
+	LDR R3, =GPIOB_ODR
+	MOV R4, #1
+	MOV R5, R1
+POWER_2
+	CMP R5, #0
+	BEQ END_POWER_2
+	LSL R4, #1
+	SUB R5, #1
+	B	POWER_2
+END_POWER_2
+
+	STR R4, [R3]			;multiply 2^R1
+	SUB R0, #1
+	ADD R1, #1
+	;
 	CMP R0, R11
 	BEQ END_F
+	CMP R1, #4
+	MOVEQ R1, #0
+	MOVEQ R2, #0
+	BL 	DELAY
+	B 	GO_DOWN
 
 
 END_F
