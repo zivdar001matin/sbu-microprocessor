@@ -36,6 +36,10 @@ SystemInit FUNCTION
 ; main logic of code
 __main FUNCTION
 
+LOOP_3
+	BL	ResetCheck
+	B	LOOP_3
+
 GET_FIRST
 	MOV R9, #0
 	BL GetKeyPress
@@ -339,4 +343,19 @@ TO_RETURN
 	MOV PC, LR
 
  ENDFUNC
+
+ResetCheck FUNCTION
+;	reset function
+	PUSH {R0, R1, R2}
+	LDR R2 , =GPIOB_IDR
+	LDR R0 , [R2]
+	;check if reset is pressed
+	MOV R3 , 0xFFEF
+	ORR R0, R0, R3
+	CMP R0 , R3
+	POP {R0, R1, R2}
+	BEQ GET_FIRST
+	MOV PC, LR
+ ENDFUNC
+
  END
