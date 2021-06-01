@@ -36,9 +36,9 @@ int main(void) {
 
         delayMs(1000);
 
-        /* clear LCD display */
-        LCD_command(1);
-        delayMs(500);
+        // /* clear LCD display */
+        // LCD_command(1);
+        // delayMs(500);
     }
 }
 
@@ -178,10 +178,10 @@ char keypad_getkey(void) {
         return 0;                       /* if we get here, no key is pressed */
 
     /* gets here when one of the rows has key pressed, check which column it is */
-    if (col == 0x0E00) return row * 4 + 1;    /* key in column 0 */
-    if (col == 0x0D00) return row * 4 + 2;    /* key in column 1 */
-    if (col == 0x0B00) return row * 4 + 3;    /* key in column 2 */
-    if (col == 0x0700) return row * 4 + 4;    /* key in column 3 */
+    if (col == 0x0600) return row * 4 + 1;    /* key in column 0 */
+    if (col == 0x0500) return row * 4 + 2;    /* key in column 1 */
+    if (col == 0x0300) return row * 4 + 3;    /* key in column 2 */
+    // if (col == 0x0700) return row * 4 + 4;    /* key in column 3 */
 
     return 0;   /* just to be safe */
 }
