@@ -9,7 +9,7 @@ void delay(volatile uint32_t);
 
 void show_student_id(void);
 void show_different_signals(void);
-void show_packet_on_lcd(void);
+void show_on_lcd(void);
 void show_integer_on_lcd(uint32_t value);
 void get_signal_type(void);
 uint32_t get_analog_value(uint32_t minimum, uint32_t maximum);
@@ -29,6 +29,12 @@ volatile static uint32_t signal_type;
 volatile static uint32_t signal_duration;
 volatile static uint32_t signal_frequency;
 
+volatile static uint32_t b_fixed = 0;
+volatile static uint32_t b_floating = 1;
+volatile static uint32_t voltage_unit_fixed = 1;
+volatile static uint32_t voltage_unit_floating = 0;
+volatile static uint32_t time_unit = 100;
+
 int main(){
 	INIT_PORTA();
 	INIT_PORTB();
@@ -36,10 +42,6 @@ int main(){
 	INIT_TIMER();
 	
 	LCD_init();
-	
-	// First show student ID
-	show_student_id();
-	delay(1000);
 
 	while(1){
 		// Get signal type
@@ -48,8 +50,8 @@ int main(){
 		signal_duration = get_analog_value(500, 10000);
 		signal_frequency = get_analog_value(1, 1000);
 				
-		// Show packet on LCD
-		show_packet_on_lcd();
+		// Show detail on LCD
+		show_on_lcd();
 		
 		// Send Packet
 		delay(10);
@@ -67,90 +69,46 @@ int main(){
 	}
 }
 
-void show_packet_on_lcd() {
+void show_on_lcd() {
 	LCD_command(1); /* clear display and set cursor at first line */
-	if (signal_type == 1) {
-		LCD_data('S');
-		LCD_data('I');
-		LCD_data('N');
-		LCD_data(' ');
-		LCD_data('1');
-	} else if (signal_type == 2) {
-		LCD_data('S');
-		LCD_data('Q');
-		LCD_data('U');
-		LCD_data('A');
-		LCD_data('R');
-		LCD_data('E');
-		LCD_data(' ');
-		LCD_data('2');
-	} else if (signal_type == 3) {
-		LCD_data('T');
-		LCD_data('R');
-		LCD_data('I');
-		LCD_data('A');
-		LCD_data('N');
-		LCD_data('G');
-		LCD_data('L');
-		LCD_data('E');
-		LCD_data(' ');
-		LCD_data('3');
-	} else if (signal_type == 4) {
-		LCD_data('A');
-		LCD_data('B');
-		LCD_data('S');
-		LCD_data('(');
-		LCD_data('S');
-		LCD_data('I');
-		LCD_data('N');
-		LCD_data(')');
-		LCD_data(' ');
-		LCD_data('4');
-	} else if (signal_type == 5) {
-		LCD_data('S');
-		LCD_data('T');
-		LCD_data('E');
-		LCD_data('P');
-		LCD_data(' ');
-		LCD_data('5');
-	}	else if (signal_type == 6) {
-		LCD_data('S');
-		LCD_data('A');
-		LCD_data('W');
-		LCD_data('T');
-		LCD_data('O');
-		LCD_data('O');
-		LCD_data('T');
-		LCD_data('H');
-		LCD_data(' ');
-		LCD_data('6');
-	}
+    LCD_data('B');
+    LCD_data('=');
+    LCD_data('+');
+    show_integer_on_lcd(b_fixed);
+    LCD_data('.');
+    show_integer_on_lcd(b_floating);
 	
+	LCD_data(' ');
+
+	LCD_data('U');
+	LCD_data('n');
+	LCD_data('i');
+	LCD_data('t');
+	LCD_data('=');
+    show_integer_on_lcd(voltage_unit_fixed);
+    LCD_data('.');
+    show_integer_on_lcd(voltage_unit_floating);
+    LCD_data('v');
+	LCD_data(' ');
+
+
 	LCD_command(0xC0); 		/* Move cursor to next line */
 	
-	LCD_data('D');
-	LCD_data('U');
-	LCD_data('R');
-	LCD_data('A');
-	LCD_data('T');
-	LCD_data('I');
-	LCD_data('O');
-	LCD_data('N');
-	LCD_data(' ');
-	show_integer_on_lcd(signal_duration);
-	LCD_data(' ');
 	
-	LCD_data('F');
-	LCD_data('R');
-	LCD_data('E');
-	LCD_data('Q');
+	LCD_data('T');
+	LCD_data('i');
+	LCD_data('m');
+	LCD_data('e');
 	LCD_data('U');
-	LCD_data('E');
-	LCD_data('N');
-	LCD_data('C');
-	LCD_data('Y');
+	LCD_data('n');
+	LCD_data('i');
+	LCD_data('t');
 	LCD_data(' ');
-	show_integer_on_lcd(signal_frequency);
+	LCD_data('=');
+	LCD_data(' ');
+    show_integer_on_lcd(time_unit);
+	LCD_data('m');
+	LCD_data('s');
 }
 
 void show_integer_on_lcd(uint32_t value) {
@@ -230,108 +188,6 @@ uint32_t get_analog_value(uint32_t minimum, uint32_t maximum) {
 		}
 	}
 	
-}
-
-void get_signal_type() {
-	show_different_signals();
-	uint32_t key;
-	while (1) {
-		key = check_keypad();
-		if (key != 100 && key >= 1 && key <= 6) {
-			break;
-		}
-	}
-	signal_type = key;
-}
-
-void show_student_id() {
-	LCD_command(1); /* clear display and set cursor at first line */
-	LCD_data('9');
-	LCD_data('6');
-	LCD_data('2');
-	LCD_data('4');
-	LCD_data('3');
-	LCD_data('0');
-	LCD_data('1');
-	LCD_data('2');
-	delay(100);
-}
-
-void show_different_signals() {
-	LCD_command(1); 					/* clear display and set cursor at first line */
-	// LCD_command(0x80); 		/* Move cursor at first of line */
-	LCD_data('S');
-	LCD_data('I');
-	LCD_data('N');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data('1');
-	
-	LCD_data(' ');
-	
-	LCD_data('S');
-	LCD_data('Q');
-	LCD_data('U');
-	LCD_data('A');
-	LCD_data('R');
-	LCD_data('E');
-	LCD_data(' ');
-	LCD_data('2');
-	
-	LCD_data(' ');
-	
-	LCD_data('T');
-	LCD_data('R');
-	LCD_data('I');
-	LCD_data('A');
-	LCD_data('N');
-	LCD_data('G');
-	LCD_data('L');
-	LCD_data('E');
-	LCD_data(' ');
-	LCD_data('3');
-	
-	LCD_data(' ');
-	LCD_command(0xC0); 		/* Move cursor to next line */
-	
-	LCD_data('A');
-	LCD_data('B');
-	LCD_data('S');
-	LCD_data('(');
-	LCD_data('S');
-	LCD_data('I');
-	LCD_data('N');
-	LCD_data(')');
-	LCD_data(' ');
-	LCD_data('4');
-	
-	LCD_data(' ');
-	
-	LCD_data('S');
-	LCD_data('T');
-	LCD_data('E');
-	LCD_data('P');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data(' ');
-	LCD_data('5');
-	
-	LCD_data(' ');
-	
-	LCD_data('S');
-	LCD_data('A');
-	LCD_data('W');
-	LCD_data('T');
-	LCD_data('O');
-	LCD_data('O');
-	LCD_data('T');
-	LCD_data('H');
-	LCD_data(' ');
-	LCD_data('6');
 }
 
 void LCD_init() {
