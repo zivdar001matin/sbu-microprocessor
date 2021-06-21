@@ -12,7 +12,7 @@ void delay(volatile uint32_t);
 void show_on_lcd(void);
 void show_integer_on_lcd(uint32_t value);
 // void get_signal_type(void);
-// uint32_t get_analog_value(uint32_t minimum, uint32_t maximum);
+uint32_t get_analog_value(uint32_t minimum, uint32_t maximum);
 
 uint32_t check_keypad(void);
 
@@ -48,12 +48,6 @@ int main(){
 	show_on_lcd();
 
 	while(1){
-		// Get signal type
-		// get_signal_type();
-		// // Get signal duration and frequency
-		// signal_duration = get_analog_value(500, 10000);
-		// signal_frequency = get_analog_value(1, 1000);
-				
 		// Show detail on LCD
 		if (isPressed) {
 			show_on_lcd();
@@ -63,20 +57,30 @@ int main(){
 		// Get command from keypad
 		delay(10);
 		check_keypad_command();
+
+		// Read Analog
+		uint32_t digital_value_1;
+		digital_value_1 = get_analog_value(0, 2);
+		uint32_t digital_value_2;
 		
 		// Send Packet
 		delay(10);
-		uint32_t packet[5], i;
-		packet[0] = signal_type;
-		packet[1] = (signal_duration) & 0xFF;
-		packet[2] = (signal_duration >> 8) & 0xFF;
-		packet[3] = (signal_frequency) & 0xFF;
-		packet[4] = (signal_frequency >> 8) & 0xFF;
-		for (i = 0; i < 5; i++) {
-			 USART2_write(packet[i]);
+		uint32_t packet[8], i;
+		packet[0] = (digital_value_1) & 0xFF;
+		packet[1] = (digital_value_1 >> 8) & 0xFF;
+		packet[2] = (digital_value_2) & 0xFF;
+		packet[3] = (digital_value_2 >> 8) & 0xFF;
+		packet[4] = voltage_unit_fixed;
+		packet[5] = voltage_unit_floating;
+		packet[6] = b_fixed;
+		packet[7] = b_floating;
+		for (i = 0; i < 8; i++) {
+			USART2_write(packet[i]);
 		}
+
 		
-		// USART2_read(); // wait until display finished
+		
+		USART2_read(); // wait until display finished
 	}
 }
 
@@ -191,47 +195,11 @@ void check_keypad_command(void){
 }
 
 uint32_t get_analog_value(uint32_t minimum, uint32_t maximum) {
-	LCD_command(1);
-	LCD_command(0x0C); /* same configuration, only disable cursor location */
-	while (1) {
-		ADC1->CR2 |= 0x40000000;        				/* start a conversion */
-		while(!(ADC1->SR & 2)) {}       				/* wait for conv complete */
-		uint32_t converted_value = ADC1->DR;   	/* read conversion result, default 12 bit ADC (others 10 bit, 8 bit) */
-		uint32_t result = (uint32_t)((converted_value / (4096.0 - 1)) * (maximum - minimum)) + minimum; /* between minimum to maximum */
-		
-		uint32_t digits[5];
-		uint32_t result_copy = result;
-		int32_t counter = 0;
-		for (counter = 0; counter < 5; counter++) {
-				digits[counter] = result_copy % 10;
-				result_copy /= 10;
-		}
-		
-		// Show result on LCD
-		LCD_command(0x80);
-		int32_t empty = 0;
-		for (counter = 4; counter >= 0; counter--) {
-				if (digits[counter] > 0) {
-					break;
-				} else {
-					empty++;
-				}
-		}
-		for (counter = 4 - empty; counter >= 0; counter--) {
-				LCD_data('0' + digits[counter]);
-		}
-		while (empty > 0) {
-			LCD_data(' ');
-			empty--;
-		}
-		
-		uint32_t key = check_keypad();
-		if (key == 10) {
-			LCD_command(0x0E); /* reset to init configuration */
-			return result;
-		}
-	}
-	
+	ADC1->CR2 |= 0x40000000;        				/* start a conversion */
+	while(!(ADC1->SR & 2)) {}       				/* wait for conv complete */
+	uint32_t converted_value = ADC1->DR;   	/* read conversion result, default 12 bit ADC (others 10 bit, 8 bit) */
+	uint32_t result = (uint32_t)((converted_value / (4096.0 - 1)) * (maximum - minimum)) + minimum; /* between minimum to maximum */
+		return result;
 }
 
 void LCD_init() {
@@ -379,10 +347,20 @@ void INIT_PORTC(){
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 }
 void INIT_TIMER() {
-	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   /* enable TIM2 clock */
-  TIM2->CR1 |= TIM_CR1_OPM; 						/* One pulse mode: Counter stops counting at the next update event (clearing the bit CEN) */
-	TIM2->CR1 |= TIM_CR1_ARPE; 						/* Auto-reload preload enable */	
-	TIM2->PSC = 16000 - 1;
+//	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   /* enable TIM2 clock */
+  //TIM2->CR1 |= TIM_CR1_OPM; 						/* One pulse mode: Counter stops counting at the next update event (clearing the bit CEN) */
+//	TIM2->CR1 |= TIM_CR1_ARPE; 						/* Auto-reload preload enable */	
+//	TIM2->PSC = 16000 - 1;
+//	TIM2->CNT = 0;          
+//		TIM2->CR1 |= TIM_CR1_CEN;
+
+  RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   /* enable TIM2 clock */
+  TIM2->PSC = 160 -1;
+  TIM2->ARR = 100 - 1;
+  TIM2->CNT = 0;
+  TIM2->CCMR1 = 0x0060;
+  TIM2->CCER = 1;
+  TIM2->CCR1 = 50 - 1;
 }
 
 /* input between 1 to 65536 */
