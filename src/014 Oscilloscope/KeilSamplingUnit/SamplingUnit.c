@@ -7,12 +7,12 @@ void INIT_TIMER(void);
 
 void delay(volatile uint32_t);
 
-void show_student_id(void);
-void show_different_signals(void);
+// void show_student_id(void);
+// void show_different_signals(void);
 void show_on_lcd(void);
 void show_integer_on_lcd(uint32_t value);
-void get_signal_type(void);
-uint32_t get_analog_value(uint32_t minimum, uint32_t maximum);
+// void get_signal_type(void);
+// uint32_t get_analog_value(uint32_t minimum, uint32_t maximum);
 
 uint32_t check_keypad(void);
 
@@ -24,10 +24,12 @@ void LCD_ready(void);
 uint32_t USART2_read(void);
 void USART2_write(uint32_t data);
 
+void check_keypad_command(void);
+
 volatile static uint32_t isPressed = 0;
-volatile static uint32_t signal_type;
-volatile static uint32_t signal_duration;
-volatile static uint32_t signal_frequency;
+// volatile static uint32_t signal_type;
+// volatile static uint32_t signal_duration;
+// volatile static uint32_t signal_frequency;
 
 volatile static uint32_t b_fixed = 0;
 volatile static uint32_t b_floating = 1;
@@ -43,15 +45,24 @@ int main(){
 	
 	LCD_init();
 
+	show_on_lcd();
+
 	while(1){
 		// Get signal type
-		get_signal_type();
-		// Get signal duration and frequency
-		signal_duration = get_analog_value(500, 10000);
-		signal_frequency = get_analog_value(1, 1000);
+		// get_signal_type();
+		// // Get signal duration and frequency
+		// signal_duration = get_analog_value(500, 10000);
+		// signal_frequency = get_analog_value(1, 1000);
 				
 		// Show detail on LCD
-		show_on_lcd();
+		if (isPressed) {
+			show_on_lcd();
+			isPressed = 0;
+		}
+
+		// Get command from keypad
+		delay(10);
+		check_keypad_command();
 		
 		// Send Packet
 		delay(10);
@@ -65,7 +76,7 @@ int main(){
 			 USART2_write(packet[i]);
 		}
 		
-		USART2_read(); // wait until display finished
+		// USART2_read(); // wait until display finished
 	}
 }
 
@@ -144,6 +155,39 @@ void USART2_write(uint32_t data) {
 uint32_t USART2_read(void) {
     while (!(USART2->SR & 0x0020)) {}   // wait until char arrives
     return USART2->DR;
+}
+
+void check_keypad_command(void){
+	uint32_t key = check_keypad();
+	if (key == 1) {
+		if (++voltage_unit_floating == 10) {
+			voltage_unit_floating = 0;
+			voltage_unit_fixed++;
+		}
+	} else if (key == 2) {
+		if (voltage_unit_floating == 0) {
+			voltage_unit_floating = 9;
+			voltage_unit_fixed--;
+		} else {
+			voltage_unit_floating--;
+		}
+	} else if (key == 3) {
+		if (++b_floating == 10) {
+			b_floating = 0;
+			b_fixed++;
+		}
+	} else if (key == 4) {
+		if (b_floating == 0) {
+			b_floating = 9;
+			b_fixed--;
+		} else {
+			b_floating--;
+		}
+	} else if (key == 5) {
+		time_unit += 10;	
+	} else if (key == 6){
+		time_unit -= 10;
+	}
 }
 
 uint32_t get_analog_value(uint32_t minimum, uint32_t maximum) {
